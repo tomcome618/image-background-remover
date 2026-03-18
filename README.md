@@ -52,6 +52,14 @@ console.log(`Background removed: ${result.outputPath}`);
 - **MODNet** - Optimized for human portraits
 - **Fast** - Quick processing for simple backgrounds
 
+## Documentation
+
+Detailed requirements and specifications are available in the `docs/` directory:
+
+- [MVP Requirements (Chinese)](docs/Image_Background_Remover_MVP_需求文档.md) - Complete MVP requirements document
+- [MVP Requirements (Text)](docs/Image_Background_Remover_MVP_需求文档.txt) - Text version of requirements
+- [Concise Requirements](docs/Image_Background_Remover_MVP_需求文档_简洁版.md) - Simplified requirements summary
+
 ## Requirements
 
 - Node.js 16+
