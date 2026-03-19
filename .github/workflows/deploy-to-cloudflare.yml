@@ -38,8 +38,8 @@ jobs:
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: 'cfat_COmwHkVhXb1QPQyvgeVfC5pATXxNefpFKpaxcbiB3c83585a'
+          accountId: '89589fc7f3e4653ae7f0525e75d93ee5'
           projectName: 'image-background-remover'
           directory: './dist'
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
