@@ -9,8 +9,8 @@
     "test": "jest",
     "lint": "eslint src/**/*.js",
     "format": "prettier --write src/**/*.js",
-    "build": "npm run build:frontend",
-    "build:frontend": "mkdir -p dist && (cp -r public/* dist/ 2>/dev/null && echo 'Copied public files to dist' || (echo 'Creating default index.html' && echo '<!DOCTYPE html><html><head><title>Image Background Remover</title><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f5f5f5;text-align:center}h1{color:#333}.status{background:white;padding:20px;border-radius:10px;margin:20px 0}.success{color:green}.info{color:blue}</style></head><body><h1>🖼️ Image Background Remover</h1><div class=\"status\"><p class=\"success\">✅ Cloudflare Pages Deployment Successful</p><p class=\"info\">🚀 Built and deployed automatically</p><p>Visit GitHub repo for source code</p></div></body></html>' > dist/index.html))",
+    "build": "node build.js",
+    "build:frontend": "node build.js",
     "predeploy": "npm run build"
   },
   "keywords": [

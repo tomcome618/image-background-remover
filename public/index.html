@@ -210,6 +210,51 @@
             <p>部署完成后，可以通过以上地址访问应用</p>
         </div>
         
+        <!-- 图片上传和处理区域 -->
+        <div class="upload-section" style="margin: 30px 0;">
+            <h3>🖼️ 图片背景移除</h3>
+            
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <div style="font-size: 1.2em; margin-bottom: 10px;">
+                    📁 点击选择图片或拖拽到此处
+                </div>
+                <div style="color: #666; font-size: 0.9em;">
+                    支持 JPG, PNG, WebP 格式 (最大 10MB)
+                </div>
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-box">
+                    <div style="font-weight: bold; margin-bottom: 10px;">原图</div>
+                    <img id="originalPreview" class="preview-img" alt="原图预览">
+                </div>
+                <div class="preview-box">
+                    <div style="font-weight: bold; margin-bottom: 10px;">处理后</div>
+                    <img id="processedPreview" class="preview-img" alt="处理后预览">
+                </div>
+            </div>
+            
+            <button id="processBtn" class="btn" style="width: 200px; margin: 20px auto; display: block;" disabled>
+                开始移除背景
+            </button>
+            
+            <div id="loading">
+                <div>🔄 正在处理中，请稍候...</div>
+                <div style="margin-top: 10px; font-size: 0.9em;">正在调用 Remove.bg API 处理图片</div>
+            </div>
+            
+            <div id="error"></div>
+            
+            <div id="result">
+                <div style="font-weight: bold; margin-bottom: 10px;">✅ 背景移除完成！</div>
+                <a id="downloadLink" class="btn" style="background: #28a745;">
+                    ⬇️ 下载透明背景图片
+                </a>
+                <div id="creditsInfo"></div>
+            </div>
+        </div>
+        
         <div class="features">
             <div class="feature">
                 <div class="feature-icon">🚀</div>
@@ -249,10 +294,15 @@
             <p>📧 项目问题反馈: 通过 GitHub Issues 提交</p>
             <p>🔄 自动部署: 推送代码到 master 分支触发</p>
             <p>🔧 技术支持: Cloudflare Pages + Remove.bg API</p>
+            <p id="apiStatus" class="status-warning">⚠️ API Key 状态检测中...</p>
             <p>© 2026 Image Background Remover - 部署时间: <span id="currentDate"></span></p>
         </div>
     </div>
     
+    <!-- API Key 配置 (通过环境变量注入) -->
+    <div id="apiKeyConfig" data-api-key="uRDGpJCnTetH4cwCJSQVUW2L" style="display: none;"></div>
+    
+    <script src="background-remover.js"></script>
     <script>
         // 显示当前日期
         const now = new Date();
@@ -264,28 +314,111 @@
             minute: '2-digit'
         });
         
-        // 如果是通过 pages.dev 访问，更新显示
+        // 更新部署信息显示
         if (window.location.hostname.includes('pages.dev')) {
             document.getElementById('deployUrl').textContent = window.location.href;
             document.querySelector('.status-item:nth-child(4) .status-value').textContent = '✅ 运行中';
             document.querySelector('.status-item:nth-child(4) .status-value').className = 'status-value success';
-        }
-        
-        // 检查部署状态
-        async function checkDeployStatus() {
-            try {
-                const response = await fetch('/health');
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('服务状态:', data);
-                }
-            } catch (error) {
-                console.log('后端服务未运行，这是静态部署版本');
+            
+            // 显示 Cloudflare Pages 部署信息
+            const deployInfo = document.querySelector('.deploy-info');
+            if (deployInfo) {
+                deployInfo.innerHTML += `
+                    <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 5px;">
+                        <p style="margin: 0; color: #2e7d32;">
+                            ✅ 当前运行在 Cloudflare Pages 全球 CDN 上
+                        </p>
+                    </div>
+                `;
             }
         }
         
-        // 页面加载时检查
-        window.addEventListener('load', checkDeployStatus);
+        // 添加样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .status-success { color: #28a745; font-weight: bold; }
+            .status-warning { color: #ffc107; font-weight: bold; }
+            .status-error { color: #dc3545; font-weight: bold; }
+            
+            #uploadArea {
+                border: 3px dashed #ccc;
+                border-radius: 10px;
+                padding: 60px 20px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                margin: 20px 0;
+            }
+            
+            #uploadArea:hover {
+                border-color: #007bff;
+                background: #f8f9fa;
+            }
+            
+            #uploadArea.dragover {
+                border-color: #28a745;
+                background: #e8f5e9;
+            }
+            
+            #previewContainer {
+                display: none;
+                justify-content: space-around;
+                margin: 20px 0;
+                gap: 20px;
+            }
+            
+            .preview-box {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .preview-img {
+                max-width: 100%;
+                max-height: 300px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                display: none;
+            }
+            
+            #loading {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+                color: #007bff;
+            }
+            
+            #error {
+                display: none;
+                background: #f8d7da;
+                color: #721c24;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+                text-align: center;
+            }
+            
+            #result {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+                padding: 20px;
+                background: #d4edda;
+                border-radius: 10px;
+            }
+            
+            #downloadLink {
+                display: none;
+                margin-top: 15px;
+            }
+            
+            #creditsInfo {
+                display: none;
+                margin-top: 10px;
+                font-size: 0.9em;
+                color: #6c757d;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
