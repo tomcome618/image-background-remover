@@ -13,7 +13,7 @@ if (!fs.existsSync(distDir)) {
 }
 
 // 读取环境变量
-const apiKey = process.env.REMOVE_BG_API_KEY || 'YOUR_API_KEY_HERE';
+const apiKey = process.env.REMOVE_BG_API_KEY || 'uRDGpJCnTetH4cwCJSQVUW2L';
 const nodeEnv = process.env.NODE_ENV || 'production';
 
 console.log(`环境变量: NODE_ENV=${nodeEnv}, API_KEY=${apiKey ? '已设置' : '未设置'}`);
