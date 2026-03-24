@@ -225,12 +225,30 @@
       width: 20px;
       height: 20px;
     }
+    .api-status {
+      text-align: center;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    .api-status.healthy {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4CAF50;
+    }
+    .api-status.unhealthy {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
   </style>
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <div class="container">
+    <!-- API 状态 -->
+    <div class="api-status" id="apiStatus">
+      正在检查 API 状态...
+    </div>
+    
     <!-- 用户信息区域 -->
     <div class="user-info" id="userInfo" style="display: none;">
       <div class="user-details">
@@ -249,21 +267,10 @@
     <div class="auth-required" id="authRequired">
       <h3>🔐 需要登录</h3>
       <p>请使用 Google 账号登录以使用图片背景移除功能</p>
-      <div id="g_id_onload"
-        data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false">
-      </div>
-      <div class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="filled_blue"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left">
-      </div>
+      <a href="https://image-bg-remover-oauth.tomcome618.workers.dev/api/auth/google" class="google-btn">
+        <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
+        使用 Google 登录
+      </a>
     </div>
     
     <h1>🖼️ Image Background Remover</h1>
@@ -307,16 +314,17 @@
     </div>
     
     <div class="footer">
-      <p>使用 Remove.bg API 技术 | 用户认证版本</p>
-      <p>API Key: 已配置 | 认证: Google OAuth</p>
+      <p>使用 Remove.bg API 技术 | 完整 OAuth 认证版本</p>
+      <p>API: Cloudflare Workers + D1 数据库 | 认证: Google OAuth 2.0</p>
     </div>
   </div>
   
   <script>
-    // 存储用户信息的键名
-    const USER_STORAGE_KEY = 'image_bg_remover_user'
+    // API 配置
+    const API_BASE_URL = 'https://image-bg-remover-oauth.tomcome618.workers.dev'
     
     // DOM 元素
+    const apiStatus = document.getElementById('apiStatus')
     const userInfo = document.getElementById('userInfo')
     const authRequired = document.getElementById('authRequired')
     const userAvatar = document.getElementById('userAvatar')
@@ -337,83 +345,60 @@
     let currentFile = null
     let currentUser = null
     
-    // 页面加载时检查登录状态
-    document.addEventListener('DOMContentLoaded', checkAuthStatus)
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 检查 API 状态
+      await checkApiStatus()
+      
+      // 检查用户登录状态
+      await checkAuthStatus()
+    })
+    
+    // 检查 API 状态
+    async function checkApiStatus() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/health`)
+        const data = await response.json()
+        
+        if (data.status === 'healthy') {
+          apiStatus.textContent = '✅ API 服务正常'
+          apiStatus.className = 'api-status healthy'
+        } else {
+          apiStatus.textContent = '⚠️ API 服务异常'
+          apiStatus.className = 'api-status unhealthy'
+        }
+      } catch (error) {
+        apiStatus.textContent = '❌ API 服务不可用'
+        apiStatus.className = 'api-status unhealthy'
+        console.error('API 状态检查失败:', error)
+      }
+    }
     
     // 检查认证状态
-    function checkAuthStatus() {
-      const userData = getUserFromStorage()
-      
-      if (userData) {
-        currentUser = userData
-        showUserInfo(userData)
-        showAppContent()
-      } else {
-        showLoginPrompt()
-      }
-    }
-    
-    // 从存储中获取用户信息
-    function getUserFromStorage() {
+    async function checkAuthStatus() {
       try {
-        const userJson = localStorage.getItem(USER_STORAGE_KEY)
-        if (!userJson) return null
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          credentials: 'include' // 包含 cookies
+        })
         
-        const userData = JSON.parse(userJson)
-        
-        // 简单检查是否过期（7天）
-        const now = Date.now()
-        if (userData.timestamp && (now - userData.timestamp > 7 * 24 * 60 * 60 * 1000)) {
-          clearUserStorage()
-          return null
+        if (response.status === 401) {
+          showLoginPrompt()
+          return
         }
         
-        return userData
+        const data = await response.json()
+        
+        if (data.authenticated) {
+          currentUser = data.user
+          showUserInfo(data.user)
+          showAppContent()
+        } else {
+          showLoginPrompt()
+        }
       } catch (error) {
-        console.error('读取用户信息失败:', error)
-        clearUserStorage()
-        return null
+        console.error('认证状态检查失败:', error)
+        showLoginPrompt()
       }
-    }
-    
-    // 保存用户信息到存储
-    function saveUserToStorage(userData) {
-      try {
-        userData.timestamp = Date.now()
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
-      } catch (error) {
-        console.error('保存用户信息失败:', error)
-      }
-    }
-    
-    // 清除用户存储
-    function clearUserStorage() {
-      localStorage.removeItem(USER_STORAGE_KEY)
-    }
-    
-    // Google OAuth 回调函数
-    window.handleCredentialResponse = function(response) {
-      console.log('Google OAuth 登录成功')
-      
-      // 解码 JWT token 获取用户信息
-      const token = response.credential
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      
-      const userData = {
-        id: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
-        token: token
-      }
-      
-      // 保存用户信息
-      saveUserToStorage(userData)
-      currentUser = userData
-      
-      // 更新UI
-      showUserInfo(userData)
-      showAppContent()
     }
     
     // 显示用户信息
@@ -440,21 +425,24 @@
     }
     
     // 登出按钮点击
-    logoutBtn.addEventListener('click', () => {
-      clearUserStorage()
-      currentUser = null
-      showLoginPrompt()
-      
-      // 调用 Google 登出
-      if (typeof google !== 'undefined') {
-        google.accounts.id.disableAutoSelect()
-        google.accounts.id.revoke(currentUser?.email, () => {
-          console.log('Google 账号已登出')
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+          method: 'POST',
+          credentials: 'include'
         })
+        
+        if (response.ok) {
+          currentUser = null
+          showLoginPrompt()
+        }
+      } catch (error) {
+        console.error('登出失败:', error)
+        showError('登出失败，请刷新页面重试')
       }
     })
     
-    // 图片上传相关功能（保持原有功能）
+    // 图片上传相关功能
     uploadArea.addEventListener('dragover', (e) => {
       e.preventDefault()
       uploadArea.classList.add('dragover')
@@ -538,4 +526,6 @@
           processedPreview.src = data.processedUrl
           downloadLink.href = data.processedUrl
           downloadLink.download = 'background-removed.png'
-          result.style.display =
+          result.style.display = 'block'
+        } else {
+          showError(data.error || '图片处理失败')
