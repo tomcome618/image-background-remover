@@ -59,7 +59,7 @@ if (fs.existsSync(publicDir)) {
                     if (nodeEnv === 'production') {
                         content = content.replace(
                             '<title>Image Background Remover 🖼️</title>',
-                            '<title>Image Background Remover 🖼️ (生产环境)</title>'
+                            '<title>Image Background Remover 🖼️</title>'
                         );
                     }
                 }
