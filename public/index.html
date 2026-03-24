@@ -138,29 +138,10 @@
           color: rgba(255, 255, 255, 0.7);
           font-size: 0.9em;
         }
-        .oauth-note {
-          background: rgba(255, 255, 255, 0.15);
-          border-radius: 10px;
-          padding: 15px;
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .oauth-link {
-          color: #4CAF50;
-          text-decoration: none;
-          font-weight: bold;
-        }
-        .oauth-link:hover {
-          text-decoration: underline;
-        }
       </style>
     </head>
     <body>
       <div class="container">
-        <div class="oauth-note">
-          <p>💡 <strong>高级版本可用</strong>: 想要更多功能？尝试我们的 <a href="http://43.162.82.13:3000" class="oauth-link">OAuth 认证版本</a>，支持用户管理和更多高级功能！</p>
-        </div>
-        
         <h1>🖼️ Image Background Remover</h1>
         
         <div class="upload-area" id="uploadArea">
@@ -199,7 +180,7 @@
         </div>
         
         <div class="footer">
-          <p>使用 Remove.bg API 技术 | 静态版本</p>
+          <p>使用 Remove.bg API 技术</p>
           <p>API Key: 已配置 | 版本: 1.0.0</p>
         </div>
       </div>
@@ -324,9 +305,6 @@
         function hideResult() {
           result.style.display = 'none';
         }
-        
-        // 注意：静态版本需要后端API支持
-        // 这里假设API端点可用，实际部署时需要相应后端
       </script>
     </body>
     </html>
