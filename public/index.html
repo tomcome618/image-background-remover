@@ -235,7 +235,7 @@
       }
       
       // 保存用户信息
-      localStorage.setItem('userData', JSON.stringify(userData))
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
       
       // 更新UI
       const userAvatar = document.getElementById('userAvatar')
@@ -381,7 +381,9 @@
     
     // 检查认证状态
     function checkAuthStatus() {
+      console.log('checkAuthStatus called')
       const userData = getUserFromStorage()
+      console.log('checkAuthStatus, userData:', userData)
       
       if (userData) {
         currentUser = userData
@@ -524,6 +526,7 @@
     })
     
     function handleFile(file) {
+      console.log('handleFile called, currentUser:', currentUser, 'window.currentUser:', window.currentUser)
       if (!currentUser) {
         showError('请先登录')
         return
