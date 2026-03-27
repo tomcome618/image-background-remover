@@ -458,6 +458,7 @@
     
     // 登出按钮点击
     logoutBtn.addEventListener('click', () => {
+      const userEmail = currentUser?.email
       clearUserStorage()
       currentUser = null
       showLoginPrompt()
@@ -467,9 +468,11 @@
       // 调用 Google 登出
       if (typeof google !== 'undefined') {
         google.accounts.id.disableAutoSelect()
-        google.accounts.id.revoke(currentUser?.email, () => {
-          console.log('Google 账号已登出')
-        })
+        if (userEmail) {
+          google.accounts.id.revoke(userEmail, () => {
+            console.log('Google 账号已登出')
+          })
+        }
       }
     })
     
