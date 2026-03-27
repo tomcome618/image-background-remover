@@ -458,6 +458,20 @@
       processBtn.disabled = true
     }
     
+    function showError(message) {
+      error.textContent = message
+      error.style.display = 'block'
+    }
+    
+    function hideError() {
+      error.style.display = 'none'
+    }
+    
+    function hideResult() {
+      result.style.display = 'none'
+      downloadLink.style.display = 'none'
+    }
+    
     // 登出按钮点击 - 使用 onclick 而非 addEventListener
     logoutBtn.onclick = function() {
       console.log('退出登录按钮被点击, currentUser:', currentUser)
@@ -540,15 +554,22 @@
     
     // 处理按钮点击
     processBtn.addEventListener('click', async () => {
-      if (!currentUser || !currentFile) return
+      if (!currentUser) {
+        showError('请先登录')
+        return
+      }
+      if (!currentFile) {
+        showError('请先选择图片')
+        return
+      }
       
-      const formData = new FormData()
-      formData.append('image', currentFile)
-      formData.append('userId', currentUser.id)
-      
-      loading.style.display = 'block'
-      processBtn.disabled = true
-      hideError()
+      // 调用 BackgroundRemover 的处理方法
+      if (window.backgroundRemover) {
+        window.backgroundRemover.currentFile = currentFile
+        window.backgroundRemover.processImage()
+      } else {
+        showError('图片处理组件未初始化，请刷新页面')
+      }
     })
     
     // 登出按钮点击
