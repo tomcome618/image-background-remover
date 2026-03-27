@@ -216,7 +216,50 @@
     }
   </style>
   <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <script>
+    // Google OAuth 回调函数 - 必须在 g_id_onload 之前定义
+    window.handleCredentialResponse = function(response) {
+      console.log('Google OAuth 登录成功')
+      
+      // 解码 JWT token 获取用户信息
+      const token = response.credential
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      
+      const userData = {
+        id: payload.sub,
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture,
+        token: token
+      }
+      
+      // 保存用户信息
+      localStorage.setItem('userData', JSON.stringify(userData))
+      
+      // 更新UI
+      const userAvatar = document.getElementById('userAvatar')
+      const userName = document.getElementById('userName')
+      const userEmail = document.getElementById('userEmail')
+      const userInfo = document.getElementById('userInfo')
+      const authRequired = document.getElementById('authRequired')
+      const uploadArea = document.getElementById('uploadArea')
+      const statusMessage = document.getElementById('statusMessage')
+      
+      if (userAvatar) userAvatar.src = userData.picture || 'https://www.gravatar.com/avatar/?d=mp'
+      if (userName) userName.textContent = userData.name
+      if (userEmail) userEmail.textContent = userData.email
+      if (userInfo) userInfo.style.display = 'flex'
+      if (authRequired) authRequired.style.display = 'none'
+      if (uploadArea) uploadArea.style.display = 'block'
+      if (statusMessage) {
+        statusMessage.textContent = '✅ 登录成功: ' + userData.name
+        statusMessage.className = 'status-message success'
+      }
+      
+      console.log('用户信息:', userData)
+    }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -388,33 +431,6 @@
     // 清除用户存储
     function clearUserStorage() {
       localStorage.removeItem(USER_STORAGE_KEY)
-    }
-    
-    // Google OAuth 回调函数
-    window.handleCredentialResponse = function(response) {
-      console.log('Google OAuth 登录成功')
-      
-      // 解码 JWT token 获取用户信息
-      const token = response.credential
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      
-      const userData = {
-        id: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        picture: payload.picture,
-        token: token
-      }
-      
-      // 保存用户信息
-      saveUserToStorage(userData)
-      currentUser = userData
-      
-      // 更新UI
-      showUserInfo(userData)
-      showAppContent()
-      statusMessage.textContent = '✅ 登录成功: ' + userData.name
-      statusMessage.className = 'status-message success'
     }
     
     // 显示用户信息
