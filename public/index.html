@@ -458,6 +458,7 @@
     
     // 登出按钮点击
     logoutBtn.addEventListener('click', () => {
+      console.log('退出登录按钮被点击, currentUser:', currentUser)
       const userEmail = currentUser?.email
       clearUserStorage()
       currentUser = null
