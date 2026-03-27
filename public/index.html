@@ -305,9 +305,11 @@
     
     <h1>🖼️ Image Background Remover</h1>
     
+    <!-- 隐藏的文件输入 - 放在 uploadArea 外面避免重复触发 -->
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    
     <!-- 上传区域 -->
     <div class="upload-area" id="uploadArea" style="display: none;">
-      <input type="file" id="fileInput" accept="image/*">
       <label for="fileInput" class="upload-label">
         📁 点击选择图片或拖拽到此处
       </label>
@@ -515,7 +517,8 @@
       }
     })
     
-    uploadArea.addEventListener('click', () => {
+    uploadArea.addEventListener('click', (e) => {
+      e.stopPropagation()  // 阻止事件冒泡，避免触发两次
       fileInput.click()
     })
     
