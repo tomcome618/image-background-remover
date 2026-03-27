@@ -13,20 +13,39 @@ class BackgroundRemover {
     }
 
     async loadApiKey() {
-        // 在生产环境中，API Key 应该通过环境变量设置
-        // 在 Cloudflare Pages 中，可以通过环境变量注入
-        // 这里使用一个占位符，实际部署时需要配置
-        this.apiKey = 'YOUR_API_KEY_HERE';
-        
-        // 尝试从环境变量获取
-        if (typeof process !== 'undefined' && process.env && process.env.REMOVE_BG_API_KEY) {
-            this.apiKey = process.env.REMOVE_BG_API_KEY;
-        }
-        
-        // 或者从页面配置获取
+        // 从页面配置获取 API Key
         const configElement = document.getElementById('apiKeyConfig');
         if (configElement && configElement.dataset.apiKey) {
             this.apiKey = configElement.dataset.apiKey;
+            console.log('从页面配置获取 API Key');
+        }
+        
+        // 如果页面配置没有，尝试从环境变量获取
+        if (!this.apiKey && typeof process !== 'undefined' && process.env && process.env.REMOVE_BG_API_KEY) {
+            this.apiKey = process.env.REMOVE_BG_API_KEY;
+            console.log('从环境变量获取 API Key');
+        }
+        
+        // 如果都没有，使用实际的 API Key
+        if (!this.apiKey || this.apiKey === 'YOUR_API_KEY_HERE') {
+            this.apiKey = 'uRDGpJCnTetH4cwCJSQVUW2L';
+            console.log('使用硬编码的 API Key');
+        }
+        
+        // 更新 UI 状态
+        this.updateApiStatus();
+    }
+    
+    updateApiStatus() {
+        const apiStatusElement = document.getElementById('apiStatus');
+        if (apiStatusElement) {
+            if (this.apiKey && this.apiKey !== 'YOUR_API_KEY_HERE') {
+                apiStatusElement.textContent = '✅ API Key 已配置';
+                apiStatusElement.className = 'status-success';
+            } else {
+                apiStatusElement.textContent = '❌ API Key 未配置';
+                apiStatusElement.className = 'status-error';
+            }
         }
     }
 

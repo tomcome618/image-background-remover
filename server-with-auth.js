@@ -1,11 +1,14 @@
-// 加载环境变量
-require('dotenv').config();
-
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
+const { passport, ensureAuthenticated, ensureNotAuthenticated } = require('./auth');
 const RemoveBgAPI = require('./removebg-api');
+
 const app = express();
 const port = 3000;
 
@@ -43,28 +46,174 @@ const upload = multer({
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// 会话配置
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24小时
+    secure: false, // 生产环境应该设为true（HTTPS）
+    httpOnly: true
+  }
+}));
+
+// 初始化Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // 创建公共目录
 if (!fs.existsSync('public')) {
   fs.mkdirSync('public');
 }
 
-// API Key 检查端点
-app.get('/api/check-api-key', (req, res) => {
-  const hasApiKey = !!process.env.REMOVE_BG_API_KEY;
-  res.json({
-    success: true,
-    hasApiKey: hasApiKey,
-    message: hasApiKey ? 'API Key 已配置' : 'API Key 未配置',
-    keyPreview: hasApiKey ? process.env.REMOVE_BG_API_KEY.substring(0, 10) + '...' : null,
-    environment: process.env.NODE_ENV || 'production',
-    serverTime: new Date().toISOString()
+// 登录页面
+app.get('/login', ensureNotAuthenticated, (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>登录 - Image Background Remover</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+          max-width: 400px;
+          margin: 0 auto;
+          padding: 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .login-container {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          text-align: center;
+          width: 100%;
+        }
+        h1 {
+          color: white;
+          margin-bottom: 30px;
+          font-size: 2em;
+        }
+        .google-btn {
+          background: white;
+          color: #757575;
+          border: none;
+          padding: 15px 30px;
+          font-size: 1.1em;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          margin: 20px 0;
+        }
+        .google-btn:hover {
+          background: #f5f5f5;
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .google-icon {
+          width: 24px;
+          height: 24px;
+        }
+        .info {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.9em;
+          margin-top: 20px;
+        }
+        .back-link {
+          color: rgba(255, 255, 255, 0.7);
+          text-decoration: none;
+          font-size: 0.9em;
+          margin-top: 20px;
+          display: inline-block;
+        }
+        .back-link:hover {
+          color: white;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="login-container">
+        <h1>🖼️ Image Background Remover</h1>
+        <p style="color: white; margin-bottom: 30px;">请登录以使用图片背景移除功能</p>
+        
+        <a href="/auth/google" class="google-btn">
+          <img src="https://www.google.com/favicon.ico" alt="Google" class="google-icon">
+          使用 Google 账号登录
+        </a>
+        
+        <div class="info">
+          登录后您可以：
+          <ul style="text-align: left; margin: 10px 0; padding-left: 20px;">
+            <li>使用图片背景移除功能</li>
+            <li>查看处理历史记录</li>
+            <li>管理您的账户设置</li>
+          </ul>
+        </div>
+        
+        <a href="/" class="back-link">返回首页</a>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// Google OAuth 认证路由
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // 认证成功，重定向到主页
+    res.redirect('/');
+  }
+);
+
+// 登出路由
+app.get('/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
   });
 });
 
-// 主页
-app.get('/', (req, res) => {
-  console.log(`📨 收到主页请求: Host=${req.headers.host}, IP=${req.ip}`);
+// 用户信息API
+app.get('/api/user', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({
+      authenticated: true,
+      user: {
+        name: req.user.name,
+        email: req.user.email,
+        picture: req.user.picture
+      }
+    });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
+
+// 主页 - 需要登录
+app.get('/', ensureAuthenticated, (req, res) => {
+  const user = req.user;
   res.send(`
     <!DOCTYPE html>
     <html lang="zh-CN">
@@ -81,6 +230,53 @@ app.get('/', (req, res) => {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
           color: white;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+        }
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 10px 15px;
+          border-radius: 10px;
+          backdrop-filter: blur(5px);
+        }
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 2px solid white;
+        }
+        .user-details {
+          display: flex;
+          flex-direction: column;
+        }
+        .user-name {
+          font-weight: bold;
+          font-size: 1.1em;
+        }
+        .user-email {
+          font-size: 0.8em;
+          opacity: 0.8;
+        }
+        .logout-btn {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          padding: 8px 15px;
+          border-radius: 5px;
+          cursor: pointer;
+          text-decoration: none;
+          font-size: 0.9em;
+          transition: all 0.3s;
+        }
+        .logout-btn:hover {
+          background: rgba(255, 255, 255, 0.3);
         }
         .container {
           background: rgba(255, 255, 255, 0.1);
@@ -209,6 +405,17 @@ app.get('/', (req, res) => {
       </style>
     </head>
     <body>
+      <div class="header">
+        <div class="user-info">
+          <img src="${user.picture}" alt="${user.name}" class="user-avatar">
+          <div class="user-details">
+            <div class="user-name">${user.name}</div>
+            <div class="user-email">${user.email}</div>
+          </div>
+        </div>
+        <a href="/logout" class="logout-btn">登出</a>
+      </div>
+      
       <div class="container">
         <h1>🖼️ Image Background Remover</h1>
         
@@ -248,7 +455,7 @@ app.get('/', (req, res) => {
         </div>
         
         <div class="footer">
-          <p>使用 Remove.bg API 技术 | 本地测试版本</p>
+          <p>使用 Remove.bg API 技术 | 已登录用户: ${user.email}</p>
           <p>API Key: ${process.env.REMOVE_BG_API_KEY ? '已配置' : '未配置'}</p>
         </div>
       </div>
@@ -319,162 +526,3 @@ app.get('/', (req, res) => {
             processBtn.disabled = false;
             hideError();
             hideResult();
-          };
-          reader.readAsDataURL(file);
-        }
-        
-        // 处理按钮点击
-        processBtn.addEventListener('click', async () => {
-          if (!currentFile) return;
-          
-          const formData = new FormData();
-          formData.append('image', currentFile);
-          
-          // 显示加载中
-          loading.style.display = 'block';
-          processBtn.disabled = true;
-          hideError();
-          hideResult();
-          
-          try {
-            const response = await fetch('/process', {
-              method: 'POST',
-              body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-              // 显示处理后的图片
-              processedPreview.src = data.processedUrl;
-              downloadLink.href = data.processedUrl;
-              downloadLink.download = 'background-removed.png';
-              result.style.display = 'block';
-            } else {
-              showError(data.error || '处理失败');
-            }
-          } catch (err) {
-            showError('网络错误: ' + err.message);
-          } finally {
-            loading.style.display = 'none';
-            processBtn.disabled = false;
-          }
-        });
-        
-        function showError(message) {
-          error.textContent = message;
-          error.style.display = 'block';
-        }
-        
-        function hideError() {
-          error.style.display = 'none';
-        }
-        
-        function hideResult() {
-          result.style.display = 'none';
-        }
-      </script>
-    </body>
-    </html>
-  `);
-});
-
-// 初始化 Remove.bg API
-let removeBgClient;
-try {
-  removeBgClient = new RemoveBgAPI();
-  console.log('✅ Remove.bg API 客户端初始化成功');
-} catch (error) {
-  console.error('❌ Remove.bg API 初始化失败:', error.message);
-  removeBgClient = null;
-}
-
-// 处理图片上传
-app.post('/process', upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: '请上传图片文件' });
-    }
-    
-    // 检查 API 客户端
-    if (!removeBgClient) {
-      return res.status(500).json({ 
-        success: false, 
-        error: 'Remove.bg API 未正确配置，请检查 API Key' 
-      });
-    }
-    
-    const inputPath = req.file.path;
-    const outputFilename = `processed-${Date.now()}.png`;
-    const outputPath = path.join('public', outputFilename);
-    
-    console.log(`处理图片: ${inputPath} -> ${outputPath}`);
-    
-    // 使用 Remove.bg API 处理图片
-    const result = await removeBgClient.removeBackground(inputPath, outputPath, {
-      size: 'auto',
-      type: 'auto',
-      format: 'png'
-    });
-    
-    console.log('处理结果:', result);
-    
-    // 清理上传的临时文件
-    try {
-      fs.unlinkSync(inputPath);
-    } catch (e) {
-      console.warn('清理临时文件失败:', e.message);
-    }
-    
-    // 返回结果
-    res.json({
-      success: true,
-      originalUrl: `/uploads/${req.file.filename}`,
-      processedUrl: `/${outputFilename}`,
-      message: '背景移除完成',
-      credits: result.credits,
-      fileSize: result.fileSize
-    });
-    
-  } catch (error) {
-    console.error('处理错误:', error);
-    
-    // 清理临时文件
-    if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (e) {
-        // 忽略清理错误
-      }
-    }
-    
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || '处理过程中发生错误'
-    });
-  }
-});
-
-// 健康检查
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    service: 'image-background-remover',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// 启动服务器
-app.listen(port, '0.0.0.0', () => {
-  console.log(`🚀 服务器已启动: http://0.0.0.0:${port}`);
-  console.log(`📱 本地访问: http://localhost:${port}`);
-  console.log(`🌐 外部访问: http://43.162.82.13:${port}`);
-  console.log(`🔧 API Key 状态: ${process.env.REMOVE_BG_API_KEY ? '已配置' : '未配置'}`);
-});
-
-// 优雅关闭
-process.on('SIGTERM', () => {
-  console.log('正在关闭服务器...');
-  process.exit(0);
-});

@@ -1,0 +1,10 @@
+[dotenv@17.3.1] injecting env (5) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+✅ Remove.bg API 客户端初始化成功
+🚀 服务器已启动: http://0.0.0.0:3000
+📱 本地访问: http://localhost:3000
+🌐 外部访问: http://43.162.82.13:3000
+🔐 认证系统: Google OAuth 已启用
+🔧 API Key 状态: 已配置
+🔑 Google Client ID: 已配置
+正在关闭服务器...
