@@ -548,4 +548,30 @@
       
       loading.style.display = 'block'
       processBtn.disabled = true
-      hideError
+      hideError()
+    })
+    
+    // 登出按钮点击
+    logoutBtn.onclick = function() {
+      console.log('退出登录按钮被点击, currentUser:', currentUser)
+      const userEmail = currentUser?.email
+      clearUserStorage()
+      currentUser = null
+      window.currentUser = null
+      showLoginPrompt()
+      statusMessage.textContent = '🔐 已退出登录，请重新登录'
+      statusMessage.className = 'status-message info'
+      
+      // 调用 Google 登出
+      if (typeof google !== 'undefined') {
+        google.accounts.id.disableAutoSelect()
+        if (userEmail) {
+          google.accounts.id.revoke(userEmail, () => {
+            console.log('Google 账号已登出')
+          })
+        }
+      }
+    }
+  </script>
+</body>
+</html>
