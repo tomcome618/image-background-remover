@@ -458,8 +458,8 @@
       processBtn.disabled = true
     }
     
-    // 登出按钮点击
-    logoutBtn.addEventListener('click', () => {
+    // 登出按钮点击 - 使用 onclick 而非 addEventListener
+    logoutBtn.onclick = function() {
       console.log('退出登录按钮被点击, currentUser:', currentUser)
       const userEmail = currentUser?.email
       clearUserStorage()
@@ -478,7 +478,7 @@
           })
         }
       }
-    })
+    }
     
     // 图片上传相关功能
     uploadArea.addEventListener('dragover', (e) => {
