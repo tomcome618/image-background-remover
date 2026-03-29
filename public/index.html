@@ -517,11 +517,6 @@
       }
     })
     
-    uploadArea.addEventListener('click', (e) => {
-      e.stopPropagation()  // 阻止事件冒泡，避免触发两次
-      fileInput.click()
-    })
-    
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length) {
         handleFile(e.target.files[0])
