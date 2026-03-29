@@ -221,11 +221,11 @@
     // Google OAuth 回调函数 - 必须在 g_id_onload 之前定义
     window.handleCredentialResponse = function(response) {
       console.log('Google OAuth 登录成功')
-      
+
       // 解码 JWT token 获取用户信息
       const token = response.credential
       const payload = JSON.parse(atob(token.split('.')[1]))
-      
+
       const userData = {
         id: payload.sub,
         email: payload.email,
@@ -233,10 +233,10 @@
         picture: payload.picture,
         token: token
       }
-      
+
       // 保存用户信息
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
-      
+
       // 更新UI
       const userAvatar = document.getElementById('userAvatar')
       const userName = document.getElementById('userName')
@@ -245,7 +245,7 @@
       const authRequired = document.getElementById('authRequired')
       const uploadArea = document.getElementById('uploadArea')
       const statusMessage = document.getElementById('statusMessage')
-      
+
       if (userAvatar) userAvatar.src = userData.picture || 'https://www.gravatar.com/avatar/?d=mp'
       if (userName) userName.textContent = userData.name
       if (userEmail) userEmail.textContent = userData.email
@@ -256,7 +256,7 @@
         statusMessage.textContent = '✅ 登录成功: ' + userData.name
         statusMessage.className = 'status-message success'
       }
-      
+
       console.log('用户信息:', userData)
     }
   </script>
@@ -267,7 +267,7 @@
     <div class="status-message info" id="statusMessage">
       正在加载...
     </div>
-    
+
     <!-- 用户信息区域 -->
     <div class="user-info" id="userInfo" style="display: none;">
       <div class="user-details">
@@ -281,7 +281,7 @@
         <button id="logoutBtn" class="btn logout-btn">退出登录</button>
       </div>
     </div>
-    
+
     <!-- 登录提示区域 -->
     <div class="auth-required" id="authRequired">
       <h3>🔐 需要登录</h3>
@@ -302,12 +302,12 @@
         data-logo_alignment="left">
       </div>
     </div>
-    
+
     <h1>🖼️ Image Background Remover</h1>
-    
+
     <!-- 隐藏的文件输入 - 放在 uploadArea 外面避免重复触发 -->
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
-    
+
     <!-- 上传区域 -->
     <div class="upload-area" id="uploadArea" style="display: none;">
       <label for="fileInput" class="upload-label">
@@ -317,7 +317,7 @@
         支持 JPG, PNG, WebP 格式 (最大 10MB)
       </div>
     </div>
-    
+
     <!-- 预览区域 -->
     <div class="preview-container" id="previewContainer" style="display: none;">
       <div class="preview-box">
@@ -329,32 +329,32 @@
         <img id="processedPreview" class="preview-img" src="" alt="处理后">
       </div>
     </div>
-    
+
     <!-- 处理按钮 -->
     <button class="process-btn" id="processBtn" disabled>开始移除背景</button>
-    
+
     <div class="loading" id="loading">
       <div>🔄 正在处理中，请稍候...</div>
       <div style="margin-top: 10px; font-size: 0.9em;">这可能需要几秒钟时间</div>
     </div>
-    
+
     <div class="error" id="error"></div>
-    
+
     <div class="result" id="result">
       <div>✅ 背景移除完成！</div>
       <a class="process-btn download-btn" id="downloadLink" download>下载图片</a>
     </div>
-    
+
     <div class="footer">
       <p>使用 Remove.bg API 技术 | 客户端 Google OAuth 认证</p>
       <p>无需服务器 API | 直接使用 Google One Tap 登录</p>
     </div>
   </div>
-  
+
   <script>
     // 存储用户信息的键名
     const USER_STORAGE_KEY = 'image_bg_remover_user'
-    
+
     // DOM 元素
     const statusMessage = document.getElementById('statusMessage')
     const userInfo = document.getElementById('userInfo')
@@ -373,20 +373,20 @@
     const error = document.getElementById('error')
     const downloadLink = document.getElementById('downloadLink')
     const processedPreview = document.getElementById('processedPreview')
-    
+
     let currentFile = null
     let currentUser = null
     window.currentUser = null  // 暴露到全局以便 onclick 访问
-    
+
     // 页面加载时检查登录状态
     document.addEventListener('DOMContentLoaded', checkAuthStatus)
-    
+
     // 检查认证状态
     function checkAuthStatus() {
       console.log('checkAuthStatus called')
       const userData = getUserFromStorage()
       console.log('checkAuthStatus, userData:', userData)
-      
+
       if (userData) {
         currentUser = userData
         window.currentUser = userData  // 同步到全局
@@ -400,22 +400,22 @@
         statusMessage.className = 'status-message info'
       }
     }
-    
+
     // 从存储中获取用户信息
     function getUserFromStorage() {
       try {
         const userJson = localStorage.getItem(USER_STORAGE_KEY)
         if (!userJson) return null
-        
+
         const userData = JSON.parse(userJson)
-        
+
         // 简单检查是否过期（7天）
         const now = Date.now()
         if (userData.timestamp && (now - userData.timestamp > 7 * 24 * 60 * 60 * 1000)) {
           clearUserStorage()
           return null
         }
-        
+
         return userData
       } catch (error) {
         console.error('读取用户信息失败:', error)
@@ -423,7 +423,7 @@
         return null
       }
     }
-    
+
     // 保存用户信息到存储
     function saveUserToStorage(userData) {
       try {
@@ -433,12 +433,12 @@
         console.error('保存用户信息失败:', error)
       }
     }
-    
+
     // 清除用户存储
     function clearUserStorage() {
       localStorage.removeItem(USER_STORAGE_KEY)
     }
-    
+
     // 显示用户信息
     function showUserInfo(user) {
       userAvatar.src = user.picture || 'https://www.gravatar.com/avatar/?d=mp'
@@ -446,13 +446,13 @@
       userEmail.textContent = user.email
       userInfo.style.display = 'flex'
     }
-    
+
     // 显示应用内容
     function showAppContent() {
       authRequired.style.display = 'none'
       uploadArea.style.display = 'block'
     }
-    
+
     // 显示登录提示
     function showLoginPrompt() {
       userInfo.style.display = 'none'
@@ -461,21 +461,21 @@
       previewContainer.style.display = 'none'
       processBtn.disabled = true
     }
-    
+
     function showError(message) {
       error.textContent = message
       error.style.display = 'block'
     }
-    
+
     function hideError() {
       error.style.display = 'none'
     }
-    
+
     function hideResult() {
       result.style.display = 'none'
       downloadLink.style.display = 'none'
     }
-    
+
     // 登出按钮点击 - 使用 onclick 而非 addEventListener
     logoutBtn.onclick = function() {
       console.log('退出登录按钮被点击, currentUser:', currentUser)
@@ -486,7 +486,7 @@
       showLoginPrompt()
       statusMessage.textContent = '🔐 已退出登录，请重新登录'
       statusMessage.className = 'status-message info'
-      
+
       // 调用 Google 登出
       if (typeof google !== 'undefined') {
         google.accounts.id.disableAutoSelect()
@@ -497,51 +497,51 @@
         }
       }
     }
-    
+
     // 图片上传相关功能
     uploadArea.addEventListener('dragover', (e) => {
       e.preventDefault()
       uploadArea.classList.add('dragover')
     })
-    
+
     uploadArea.addEventListener('dragleave', () => {
       uploadArea.classList.remove('dragover')
     })
-    
+
     uploadArea.addEventListener('drop', (e) => {
       e.preventDefault()
       uploadArea.classList.remove('dragover')
-      
+
       if (e.dataTransfer.files.length) {
         handleFile(e.dataTransfer.files[0])
       }
     })
-    
+
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length) {
         handleFile(e.target.files[0])
       }
     })
-    
+
     function handleFile(file) {
       console.log('handleFile called, currentUser:', currentUser, 'window.currentUser:', window.currentUser)
       if (!currentUser) {
         showError('请先登录')
         return
       }
-      
+
       if (!file.type.match('image.*')) {
         showError('请选择图片文件')
         return
       }
-      
+
       if (file.size > 10 * 1024 * 1024) {
         showError('文件大小不能超过 10MB')
         return
       }
-      
+
       currentFile = file
-      
+
       const reader = new FileReader()
       reader.onload = (e) => {
         originalPreview.src = e.target.result
@@ -552,7 +552,7 @@
       }
       reader.readAsDataURL(file)
     }
-    
+
     // 处理按钮点击
     processBtn.addEventListener('click', async () => {
       if (!currentUser) {
@@ -563,7 +563,7 @@
         showError('请先选择图片')
         return
       }
-      
+
       // 调用 BackgroundRemover 的处理方法
       if (window.backgroundRemover) {
         window.backgroundRemover.currentFile = currentFile
@@ -572,28 +572,6 @@
         showError('图片处理组件未初始化，请刷新页面')
       }
     })
-    
-    // 登出按钮点击
-    logoutBtn.onclick = function() {
-      console.log('退出登录按钮被点击, currentUser:', currentUser)
-      const userEmail = currentUser?.email
-      clearUserStorage()
-      currentUser = null
-      window.currentUser = null
-      showLoginPrompt()
-      statusMessage.textContent = '🔐 已退出登录，请重新登录'
-      statusMessage.className = 'status-message info'
-      
-      // 调用 Google 登出
-      if (typeof google !== 'undefined') {
-        google.accounts.id.disableAutoSelect()
-        if (userEmail) {
-          google.accounts.id.revoke(userEmail, () => {
-            console.log('Google 账号已登出')
-          })
-        }
-      }
-    }
   </script>
   <script src="background-remover.js"></script>
 </body>
