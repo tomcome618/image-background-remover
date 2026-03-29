@@ -234,8 +234,8 @@
         token: token
       }
 
-      // 保存用户信息
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
+      // 保存用户信息 - 使用硬编码的 key 避免变量未定义问题
+      localStorage.setItem('image_bg_remover_user', JSON.stringify(userData))
 
       // 更新UI
       const userAvatar = document.getElementById('userAvatar')
