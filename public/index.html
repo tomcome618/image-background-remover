@@ -309,7 +309,7 @@
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
     <!-- 上传区域 -->
-    <div class="upload-area" id="uploadArea" style="display: none;" onclick="document.getElementById('fileInput').click()">
+    <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick()">
       <div class="upload-label">
         📁 点击选择图片或拖拽到此处
       </div>
@@ -518,10 +518,19 @@
     })
 
     fileInput.addEventListener('change', (e) => {
+      // 文件选择完成后，清除保护标记
+      window._fileInputSelecting = false
       if (e.target.files.length) {
         handleFile(e.target.files[0])
       }
     })
+
+    // 上传区域点击处理 - 防止重复触发
+    window.handleUploadAreaClick = function() {
+      if (window._fileInputSelecting) return
+      window._fileInputSelecting = true
+      fileInput.click()
+    }
 
     function handleFile(file) {
       console.log('handleFile called, currentUser:', currentUser, 'window.currentUser:', window.currentUser)
