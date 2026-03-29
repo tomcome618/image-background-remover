@@ -309,10 +309,10 @@
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
     <!-- 上传区域 -->
-    <div class="upload-area" id="uploadArea" style="display: none;">
-      <label for="fileInput" class="upload-label">
+    <div class="upload-area" id="uploadArea" style="display: none;" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-label">
         📁 点击选择图片或拖拽到此处
-      </label>
+      </div>
       <div class="upload-hint">
         支持 JPG, PNG, WebP 格式 (最大 10MB)
       </div>
