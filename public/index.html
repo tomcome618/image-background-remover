@@ -305,9 +305,6 @@
 
     <h1>🖼️ Image Background Remover</h1>
 
-    <!-- 隐藏的文件输入 - 放在 uploadArea 外面避免重复触发 -->
-    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-
     <!-- 上传区域 -->
     <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick(event)">
       <div class="upload-label">
@@ -364,7 +361,6 @@
     const userEmail = document.getElementById('userEmail')
     const logoutBtn = document.getElementById('logoutBtn')
     const uploadArea = document.getElementById('uploadArea')
-    const fileInput = document.getElementById('fileInput')
     const previewContainer = document.getElementById('previewContainer')
     const originalPreview = document.getElementById('originalPreview')
     const processBtn = document.getElementById('processBtn')
@@ -517,30 +513,36 @@
       }
     })
 
-    fileInput.addEventListener('change', (e) => {
-      // 文件选择完成后，清除保护标记
-      _isSelecting = false
-      console.log('File selected, files length:', e.target.files.length)
-      if (e.target.files.length) {
-        handleFile(e.target.files[0])
-      }
-    })
+    // 动态创建文件输入，避免缓存和状态问题
+    function openFileDialog() {
+      // 创建全新的 input 元素
+      const tempInput = document.createElement('input')
+      tempInput.type = 'file'
+      tempInput.accept = 'image/*'
+      tempInput.style.display = 'none'
+      document.body.appendChild(tempInput)
 
-    // 上传区域点击处理 - 用 setTimeout 避免浏览器原生双触发
-    let _isSelecting = false
+      tempInput.addEventListener('change', (e) => {
+        console.log('File selected, files length:', e.target.files.length)
+        if (e.target.files.length) {
+          handleFile(e.target.files[0])
+        }
+        // 清理临时元素
+        document.body.removeChild(tempInput)
+      })
+
+      // 用 setTimeout 确保元素已添加到 DOM
+      setTimeout(() => {
+        tempInput.click()
+      }, 10)
+    }
+
+    // 上传区域点击处理
     window.handleUploadAreaClick = function(e) {
       e.preventDefault()
       e.stopPropagation()
-      if (_isSelecting) {
-        console.log('Dialog already open, ignored')
-        return
-      }
-      _isSelecting = true
       console.log('Opening file dialog...')
-      // 用 setTimeout 延迟，确保浏览器完全准备好
-      setTimeout(() => {
-        fileInput.click()
-      }, 10)
+      openFileDialog()
     }
 
     function handleFile(file) {
