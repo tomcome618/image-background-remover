@@ -309,7 +309,7 @@
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
     <!-- 上传区域 -->
-    <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick()">
+    <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick(event)">
       <div class="upload-label">
         📁 点击选择图片或拖拽到此处
       </div>
@@ -526,22 +526,22 @@
       }
     })
 
-    // 上传区域点击处理 - 防止重复触发
+    // 上传区域点击处理 - 用 setTimeout 避免浏览器原生双触发
     let _isSelecting = false
     window.handleUploadAreaClick = function(e) {
+      e.preventDefault()
+      e.stopPropagation()
       if (_isSelecting) {
         console.log('Dialog already open, ignored')
         return
       }
       _isSelecting = true
       console.log('Opening file dialog...')
-      fileInput.click()
+      // 用 setTimeout 延迟，确保浏览器完全准备好
+      setTimeout(() => {
+        fileInput.click()
+      }, 10)
     }
-
-    // fileInput 被点击时（直接点击 input 本身，不太可能但防一下）
-    fileInput.addEventListener('click', (e) => {
-      e.stopPropagation()
-    })
 
     function handleFile(file) {
       console.log('handleFile called, currentUser:', currentUser, 'window.currentUser:', window.currentUser)
