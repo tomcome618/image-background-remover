@@ -218,6 +218,97 @@
       height: 32px;
       border-radius: 50%;
     }
+    .header-credits {
+      background: rgba(76, 175, 80, 0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .header-credits.zero {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+    .pricing-section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 30px 0;
+    }
+    .pricing-title {
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .pricing-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .pricing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .pricing-card.featured {
+      background: rgba(76, 175, 80, 0.2);
+      border: 2px solid #4CAF50;
+    }
+    .pricing-card-name {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .pricing-card-price {
+      font-size: 2em;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    .pricing-card-credits {
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 10px 0;
+    }
+    .pricing-card-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-top: 15px;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    .pricing-card-btn:hover {
+      background: #45a049;
+    }
+    .pricing-card-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    .insufficient-credits {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 15px 0;
+      display: none;
+    }
+    .insufficient-credits.show {
+      display: block;
+    }
     .auth-required {
       text-align: center;
       padding: 30px;
@@ -245,7 +336,7 @@
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script>
     // Google OAuth 回调函数 - 必须在 g_id_onload 之前定义
-    window.handleCredentialResponse = function(response) {
+    window.handleCredentialResponse = async function(response) {
       console.log('Google OAuth 登录成功')
 
       // 解码 JWT token 获取用户信息
@@ -263,6 +354,13 @@
       // 保存用户信息 - 使用硬编码的 key 避免变量未定义问题
       localStorage.setItem('image_bg_remover_user', JSON.stringify(userData))
 
+      // 调用后端注册/获取用户信息
+      const registeredUser = await registerUser(token)
+      if (registeredUser) {
+        userData.credits = registeredUser.credits
+        userCredits = registeredUser.credits
+      }
+
       // 更新UI
       const headerUserAvatar = document.getElementById('headerUserAvatar')
       const headerUserName = document.getElementById('headerUserName')
@@ -276,6 +374,7 @@
       if (headerUserName) headerUserName.textContent = userData.name
       if (headerAuth) headerAuth.style.display = 'none'
       if (headerUser) headerUser.style.display = 'flex'
+      updateCreditsDisplay()
       if (authRequired) authRequired.style.display = 'none'
       if (uploadArea) uploadArea.style.display = 'block'
       if (statusMessage) {
@@ -312,6 +411,9 @@
       <div class="header-user" id="headerUser" style="display: none;">
         <img id="headerUserAvatar" class="header-user-avatar" src="" alt="用户头像">
         <span id="headerUserName"></span>
+        <div id="headerCredits" class="header-credits">
+          💰 <span id="creditsBalance">0</span> 积分
+        </div>
         <button id="logoutBtn" class="btn logout-btn">退出</button>
       </div>
     </div>
@@ -366,6 +468,39 @@
       <a class="process-btn download-btn" id="downloadLink" download>下载图片</a>
     </div>
 
+    <!-- 积分不足提示 -->
+    <div id="insufficientCredits" class="insufficient-credits">
+      ⚠️ 积分不足！请先 <a href="#pricing" style="color: #4CAF50;">充值积分</a> 或 <a href="#pricing" style="color: #4CAF50;">升级方案</a>
+    </div>
+
+    <!-- 定价方案 -->
+    <div class="pricing-section" id="pricing">
+      <h2 class="pricing-title">💰 定价方案</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-card-name">入门包</div>
+          <div class="pricing-card-price">$3</div>
+          <div class="pricing-card-credits">20 积分</div>
+          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">首次充值优惠</div>
+          <button class="pricing-card-btn" onclick="purchasePlan('starter')">立即购买</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-card-name">标准包</div>
+          <div class="pricing-card-price">$8</div>
+          <div class="pricing-card-credits">60 积分</div>
+          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">常用选择</div>
+          <button class="pricing-card-btn" onclick="purchasePlan('standard')">立即购买</button>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-card-name">Pro 月付</div>
+          <div class="pricing-card-price">$25</div>
+          <div class="pricing-card-credits">200 积分/月</div>
+          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">高频用户首选</div>
+          <button class="pricing-card-btn" onclick="purchasePlan('pro')">立即购买</button>
+        </div>
+      </div>
+    </div>
+
     <div class="footer">
       <p>使用 Remove.bg API 技术 | 客户端 Google OAuth 认证</p>
       <p>无需服务器 API | 直接使用 Google One Tap 登录</p>
@@ -373,6 +508,9 @@
   </div>
 
   <script>
+    // API 配置 - 部署后替换为实际 URL
+    const API_BASE_URL = 'https://image-background-eraser-api.YOUR-SUBDOMAIN.workers.dev'
+    
     // 存储用户信息的键名
     const USER_STORAGE_KEY = 'image_bg_remover_user'
 
@@ -396,7 +534,92 @@
 
     let currentFile = null
     let currentUser = null
+    let userCredits = 0
     window.currentUser = null  // 暴露到全局以便 onclick 访问
+
+    // ========== API 函数 ==========
+
+    // 注册/绑定用户到后端
+    async function registerUser(googleToken) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ googleToken })
+        })
+        const data = await response.json()
+        if (data.success) {
+          userCredits = data.user.credits
+          updateCreditsDisplay()
+          return data.user
+        }
+        throw new Error(data.error || '注册失败')
+      } catch (e) {
+        console.error('注册用户失败:', e)
+        return null
+      }
+    }
+
+    // 获取用户积分
+    async function fetchCredits() {
+      if (!currentUser) return 0
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user/credits`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        })
+        const data = await response.json()
+        if (data.success) {
+          userCredits = data.credits
+          updateCreditsDisplay()
+          return data.credits
+        }
+        return 0
+      } catch (e) {
+        console.error('获取积分失败:', e)
+        return 0
+      }
+    }
+
+    // 扣减积分
+    async function deductCredits(amount, description) {
+      if (!currentUser) return false
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user/deduct`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({ amount, description })
+        })
+        const data = await response.json()
+        if (data.success) {
+          userCredits = data.credits
+          updateCreditsDisplay()
+          return true
+        }
+        throw new Error(data.error || '积分扣减失败')
+      } catch (e) {
+        console.error('扣减积分失败:', e)
+        return false
+      }
+    }
+
+    // 更新积分显示
+    function updateCreditsDisplay() {
+      const creditsEl = document.getElementById('creditsBalance')
+      const creditsContainer = document.getElementById('headerCredits')
+      if (creditsEl) {
+        creditsEl.textContent = userCredits
+      }
+      if (creditsContainer) {
+        if (userCredits <= 0) {
+          creditsContainer.classList.add('zero')
+        } else {
+          creditsContainer.classList.remove('zero')
+        }
+      }
+    }
 
     // 页面加载时检查登录状态
     document.addEventListener('DOMContentLoaded', checkAuthStatus)
@@ -465,6 +688,8 @@
       headerUserName.textContent = user.name
       headerAuth.style.display = 'none'
       headerUser.style.display = 'flex'
+      // 从后端获取最新积分
+      fetchCredits()
     }
 
     // 显示应用内容
@@ -614,6 +839,20 @@
         return
       }
 
+      // 检查积分
+      if (userCredits <= 0) {
+        document.getElementById('insufficientCredits').classList.add('show')
+        return
+      }
+      document.getElementById('insufficientCredits').classList.remove('show')
+
+      // 扣减积分 (1积分 = 1张图片)
+      const deductSuccess = await deductCredits(1, '图片背景移除')
+      if (!deductSuccess) {
+        showError('积分扣减失败，请稍后重试')
+        return
+      }
+
       // 调用 BackgroundRemover 的处理方法
       if (window.backgroundRemover) {
         window.backgroundRemover.currentFile = currentFile
@@ -622,6 +861,53 @@
         showError('图片处理组件未初始化，请刷新页面')
       }
     })
+
+    // 购买套餐 (这里先显示提示，实际需要集成支付)
+    async function purchasePlan(plan) {
+      if (!currentUser) {
+        showError('请先登录')
+        return
+      }
+      
+      const plans = {
+        starter: { name: '入门包', price: 3, credits: 20 },
+        standard: { name: '标准包', price: 8, credits: 60 },
+        pro: { name: 'Pro月付', price: 25, credits: 200 }
+      }
+      
+      const selectedPlan = plans[plan]
+      if (!selectedPlan) return
+      
+      // 模拟充值 - 实际需要集成 Stripe/PayPal 等支付
+      const confirmed = confirm(`确认购买 ${selectedPlan.name}？\n价格: $${selectedPlan.price}\n将获得 ${selectedPlan.credits} 积分`)
+      if (!confirmed) return
+      
+      // 模拟充值成功
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({
+            amount: selectedPlan.credits,
+            type: 'purchase',
+            description: `购买 ${selectedPlan.name}`
+          })
+        })
+        const data = await response.json()
+        if (data.success) {
+          userCredits = data.credits
+          updateCreditsDisplay()
+          alert(`✅ 充值成功！\n获得 ${selectedPlan.credits} 积分\n当前余额: ${userCredits} 积分`)
+        } else {
+          alert('⚠️ 充值失败，请稍后重试')
+        }
+      } catch (e) {
+        alert('⚠️ 充值服务暂时不可用，请稍后重试')
+      }
+    }
   </script>
   <script src="background-remover.js"></script>
 </body>

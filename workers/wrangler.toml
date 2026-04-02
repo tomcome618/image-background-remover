@@ -1,0 +1,14 @@
+name = "image-background-eraser-api"
+main = "api/index.js"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "../dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "image-background-eraser"
+database_id = "YOUR_DATABASE_ID_HERE"
+
+[vars]]
+FREE_CREDITS = "3"
