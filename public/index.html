@@ -192,6 +192,32 @@
       color: rgba(255, 255, 255, 0.7);
       font-size: 0.9em;
     }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header-title {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    .header-auth {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .header-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
     .auth-required {
       text-align: center;
       padding: 30px;
@@ -238,18 +264,18 @@
       localStorage.setItem('image_bg_remover_user', JSON.stringify(userData))
 
       // 更新UI
-      const userAvatar = document.getElementById('userAvatar')
-      const userName = document.getElementById('userName')
-      const userEmail = document.getElementById('userEmail')
-      const userInfo = document.getElementById('userInfo')
+      const headerUserAvatar = document.getElementById('headerUserAvatar')
+      const headerUserName = document.getElementById('headerUserName')
+      const headerAuth = document.getElementById('headerAuth')
+      const headerUser = document.getElementById('headerUser')
       const authRequired = document.getElementById('authRequired')
       const uploadArea = document.getElementById('uploadArea')
       const statusMessage = document.getElementById('statusMessage')
 
-      if (userAvatar) userAvatar.src = userData.picture || 'https://www.gravatar.com/avatar/?d=mp'
-      if (userName) userName.textContent = userData.name
-      if (userEmail) userEmail.textContent = userData.email
-      if (userInfo) userInfo.style.display = 'flex'
+      if (headerUserAvatar) headerUserAvatar.src = userData.picture || 'https://www.gravatar.com/avatar/?d=mp'
+      if (headerUserName) headerUserName.textContent = userData.name
+      if (headerAuth) headerAuth.style.display = 'none'
+      if (headerUser) headerUser.style.display = 'flex'
       if (authRequired) authRequired.style.display = 'none'
       if (uploadArea) uploadArea.style.display = 'block'
       if (statusMessage) {
@@ -263,47 +289,45 @@
 </head>
 <body>
   <div class="container">
+    <!-- Header with auth on right -->
+    <div class="header">
+      <div class="header-title">🖼️ Image Background Remover</div>
+      <div class="header-auth" id="headerAuth">
+        <div id="g_id_onload"
+          data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-shape="rectangular"
+          data-theme="filled_blue"
+          data-text="signin_with"
+          data-size="medium"
+          data-logo_alignment="left">
+        </div>
+      </div>
+      <div class="header-user" id="headerUser" style="display: none;">
+        <img id="headerUserAvatar" class="header-user-avatar" src="" alt="用户头像">
+        <span id="headerUserName"></span>
+        <button id="logoutBtn" class="btn logout-btn">退出</button>
+      </div>
+    </div>
+
     <!-- 状态消息 -->
     <div class="status-message info" id="statusMessage">
       正在加载...
     </div>
 
-    <!-- 用户信息区域 -->
-    <div class="user-info" id="userInfo" style="display: none;">
-      <div class="user-details">
-        <img id="userAvatar" class="user-avatar" src="" alt="用户头像">
-        <div>
-          <div id="userName" class="user-name"></div>
-          <div id="userEmail" class="user-email"></div>
-        </div>
-      </div>
-      <div class="auth-buttons">
-        <button id="logoutBtn" class="btn logout-btn">退出登录</button>
-      </div>
-    </div>
-
     <!-- 登录提示区域 -->
-    <div class="auth-required" id="authRequired">
+    <div class="auth-required" id="authRequired" style="display: none;">
       <h3>🔐 需要登录</h3>
-      <p>请使用 Google 账号登录以使用图片背景移除功能</p>
-      <div id="g_id_onload"
-        data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false">
-      </div>
-      <div class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="filled_blue"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left">
-      </div>
+      <p>请使用右上角 Google 按钮登录以使用图片背景移除功能</p>
     </div>
 
-    <h1>🖼️ Image Background Remover</h1>
+    <h1 style="text-align: center; margin-bottom: 30px;">Image Background Remover</h1>
 
     <!-- 上传区域 -->
     <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick(event)">
@@ -354,12 +378,12 @@
 
     // DOM 元素
     const statusMessage = document.getElementById('statusMessage')
-    const userInfo = document.getElementById('userInfo')
-    const authRequired = document.getElementById('authRequired')
-    const userAvatar = document.getElementById('userAvatar')
-    const userName = document.getElementById('userName')
-    const userEmail = document.getElementById('userEmail')
+    const headerAuth = document.getElementById('headerAuth')
+    const headerUser = document.getElementById('headerUser')
+    const headerUserAvatar = document.getElementById('headerUserAvatar')
+    const headerUserName = document.getElementById('headerUserName')
     const logoutBtn = document.getElementById('logoutBtn')
+    const authRequired = document.getElementById('authRequired')
     const uploadArea = document.getElementById('uploadArea')
     const previewContainer = document.getElementById('previewContainer')
     const originalPreview = document.getElementById('originalPreview')
@@ -392,7 +416,7 @@
         statusMessage.className = 'status-message success'
       } else {
         showLoginPrompt()
-        statusMessage.textContent = '🔐 请点击上方的 Google 按钮登录'
+        statusMessage.textContent = '🔐 请点击右上角 Google 按钮登录'
         statusMessage.className = 'status-message info'
       }
     }
@@ -437,10 +461,10 @@
 
     // 显示用户信息
     function showUserInfo(user) {
-      userAvatar.src = user.picture || 'https://www.gravatar.com/avatar/?d=mp'
-      userName.textContent = user.name
-      userEmail.textContent = user.email
-      userInfo.style.display = 'flex'
+      headerUserAvatar.src = user.picture || 'https://www.gravatar.com/avatar/?d=mp'
+      headerUserName.textContent = user.name
+      headerAuth.style.display = 'none'
+      headerUser.style.display = 'flex'
     }
 
     // 显示应用内容
@@ -451,7 +475,8 @@
 
     // 显示登录提示
     function showLoginPrompt() {
-      userInfo.style.display = 'none'
+      headerAuth.style.display = 'flex'
+      headerUser.style.display = 'none'
       authRequired.style.display = 'block'
       uploadArea.style.display = 'none'
       previewContainer.style.display = 'none'
