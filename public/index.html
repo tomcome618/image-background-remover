@@ -231,71 +231,16 @@
       background: rgba(255, 107, 107, 0.2);
       color: #ff6b6b;
     }
-    .pricing-section {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-      padding: 30px;
-      margin: 30px 0;
-    }
-    .pricing-title {
-      text-align: center;
-      font-size: 1.8em;
-      margin-bottom: 20px;
-    }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-    .pricing-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 25px;
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .pricing-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-    .pricing-card.featured {
-      background: rgba(76, 175, 80, 0.2);
-      border: 2px solid #4CAF50;
-    }
-    .pricing-card-name {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .pricing-card-price {
-      font-size: 2em;
-      font-weight: bold;
-      color: #4CAF50;
-    }
-    .pricing-card-credits {
-      font-size: 0.9em;
-      color: rgba(255, 255, 255, 0.7);
-      margin: 10px 0;
-    }
-    .pricing-card-btn {
-      background: #4CAF50;
+    .header-link {
       color: white;
-      border: none;
-      padding: 10px 20px;
+      text-decoration: none;
+      padding: 8px 15px;
       border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-      margin-top: 15px;
-      width: 100%;
+      font-size: 0.9em;
       transition: background 0.3s;
     }
-    .pricing-card-btn:hover {
-      background: #45a049;
-    }
-    .pricing-card-btn:disabled {
-      background: #666;
-      cursor: not-allowed;
+    .header-link:hover {
+      background: rgba(255,255,255,0.1);
     }
     .insufficient-credits {
       background: rgba(255, 107, 107, 0.2);
@@ -391,24 +336,28 @@
     <!-- Header with auth on right -->
     <div class="header">
       <div class="header-title">🖼️ Image Background Remover</div>
-      <div class="header-auth" id="headerAuth">
-        <div id="g_id_onload"
-          data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
-          data-context="signin"
-          data-ux_mode="popup"
-          data-callback="handleCredentialResponse"
-          data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin"
-          data-type="standard"
-          data-shape="rectangular"
-          data-theme="filled_blue"
-          data-text="signin_with"
-          data-size="medium"
-          data-logo_alignment="left">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="/pricing.html" class="header-link">💰 定价</a>
+        <div class="header-auth" id="headerAuth">
+          <div id="g_id_onload"
+            data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="popup"
+            data-callback="handleCredentialResponse"
+            data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin"
+            data-type="standard"
+            data-shape="rectangular"
+            data-theme="filled_blue"
+            data-text="signin_with"
+            data-size="medium"
+            data-logo_alignment="left">
+          </div>
         </div>
       </div>
       <div class="header-user" id="headerUser" style="display: none;">
+        <a href="/pricing.html" class="header-link">💰 定价</a>
         <img id="headerUserAvatar" class="header-user-avatar" src="" alt="用户头像">
         <span id="headerUserName"></span>
         <div id="headerCredits" class="header-credits">
@@ -470,35 +419,7 @@
 
     <!-- 积分不足提示 -->
     <div id="insufficientCredits" class="insufficient-credits">
-      ⚠️ 积分不足！请先 <a href="#pricing" style="color: #4CAF50;">充值积分</a> 或 <a href="#pricing" style="color: #4CAF50;">升级方案</a>
-    </div>
-
-    <!-- 定价方案 -->
-    <div class="pricing-section" id="pricing">
-      <h2 class="pricing-title">💰 定价方案</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card-name">入门包</div>
-          <div class="pricing-card-price">$3</div>
-          <div class="pricing-card-credits">20 积分</div>
-          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">首次充值优惠</div>
-          <button class="pricing-card-btn" onclick="purchasePlan('starter')">立即购买</button>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card-name">标准包</div>
-          <div class="pricing-card-price">$8</div>
-          <div class="pricing-card-credits">60 积分</div>
-          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">常用选择</div>
-          <button class="pricing-card-btn" onclick="purchasePlan('standard')">立即购买</button>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card-name">Pro 月付</div>
-          <div class="pricing-card-price">$25</div>
-          <div class="pricing-card-credits">200 积分/月</div>
-          <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">高频用户首选</div>
-          <button class="pricing-card-btn" onclick="purchasePlan('pro')">立即购买</button>
-        </div>
-      </div>
+      ⚠️ 积分不足！请先 <a href="/pricing.html" style="color: #4CAF50;">充值积分</a> 或 <a href="/pricing.html" style="color: #4CAF50;">升级方案</a>
     </div>
 
     <div class="footer">
@@ -861,53 +782,6 @@
         showError('图片处理组件未初始化，请刷新页面')
       }
     })
-
-    // 购买套餐 (这里先显示提示，实际需要集成支付)
-    async function purchasePlan(plan) {
-      if (!currentUser) {
-        showError('请先登录')
-        return
-      }
-      
-      const plans = {
-        starter: { name: '入门包', price: 3, credits: 20 },
-        standard: { name: '标准包', price: 8, credits: 60 },
-        pro: { name: 'Pro月付', price: 25, credits: 200 }
-      }
-      
-      const selectedPlan = plans[plan]
-      if (!selectedPlan) return
-      
-      // 模拟充值 - 实际需要集成 Stripe/PayPal 等支付
-      const confirmed = confirm(`确认购买 ${selectedPlan.name}？\n价格: $${selectedPlan.price}\n将获得 ${selectedPlan.credits} 积分`)
-      if (!confirmed) return
-      
-      // 模拟充值成功
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/user/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${currentUser.token}`
-          },
-          body: JSON.stringify({
-            amount: selectedPlan.credits,
-            type: 'purchase',
-            description: `购买 ${selectedPlan.name}`
-          })
-        })
-        const data = await response.json()
-        if (data.success) {
-          userCredits = data.credits
-          updateCreditsDisplay()
-          alert(`✅ 充值成功！\n获得 ${selectedPlan.credits} 积分\n当前余额: ${userCredits} 积分`)
-        } else {
-          alert('⚠️ 充值失败，请稍后重试')
-        }
-      } catch (e) {
-        alert('⚠️ 充值服务暂时不可用，请稍后重试')
-      }
-    }
   </script>
   <script src="background-remover.js"></script>
 </body>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>定价方案 - Image Background Remover</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+    .header a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .header a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 40px;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    .pricing-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    .pricing-card.featured {
+      background: rgba(76, 175, 80, 0.2);
+      border: 2px solid #4CAF50;
+    }
+    .pricing-card .badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4CAF50;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .pricing-card-name {
+      font-size: 1.4em;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .pricing-card-price {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #4CAF50;
+      margin-bottom: 5px;
+    }
+    .pricing-card-price span {
+      font-size: 0.4em;
+      color: rgba(255,255,255,0.7);
+    }
+    .pricing-card-credits {
+      font-size: 1.1em;
+      color: rgba(255,255,255,0.9);
+      margin: 15px 0;
+    }
+    .pricing-card-desc {
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 20px;
+    }
+    .pricing-card-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+      width: 100%;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .pricing-card-btn:hover {
+      background: #45a049;
+      transform: scale(1.02);
+    }
+    .pricing-card-btn:active {
+      transform: scale(0.98);
+    }
+    .faq-section {
+      margin-top: 50px;
+    }
+    .faq-title {
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 30px;
+    }
+    .faq-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+    .faq-question {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+    .faq-answer {
+      color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="/">← 返回首页</a>
+    </div>
+
+    <h1>💰 定价方案</h1>
+    <p class="subtitle">简单透明，按需付费，无隐藏费用</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-card-name">免费试用</div>
+        <div class="pricing-card-price">$0</div>
+        <div class="pricing-card-credits">3 积分</div>
+        <div class="pricing-card-desc">注册即送，可体验3次</div>
+        <button class="pricing-card-btn" onclick="alert('请返回首页登录后使用')">免费试用</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-card-name">入门包</div>
+        <div class="pricing-card-price">$3</div>
+        <div class="pricing-card-credits">20 积分</div>
+        <div class="pricing-card-desc">首次充值优惠，适合个人偶尔使用</div>
+        <button class="pricing-card-btn" onclick="purchasePlan('starter')">立即购买</button>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class class="badge">最受欢迎</div>
+        <div class="pricing-card-name">标准包</div>
+        <div class="pricing-card-price">$8</div>
+        <div class="pricing-card-credits">60 积分</div>
+        <div class="pricing-card-desc">常用选择，性价比最高</div>
+        <button class="pricing-card-btn" onclick="purchasePlan('standard')">立即购买</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-card-name">Pro 月付</div>
+        <div class="pricing-card-price">$25<span>/月</span></div>
+        <div class="pricing-card-credits">200 积分/月</div>
+        <div class="pricing-card-desc">高频用户首选，无限制处理</div>
+        <button class="pricing-card-btn" onclick="purchasePlan('pro')">立即购买</button>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2 class="faq-title">常见问题</h2>
+
+      <div class="faq-item">
+        <div class="faq-question">1. 积分会过期吗？</div>
+        <div class="faq-answer">按需购买的积分永不过期。订阅月费方案获得的积分每月刷新，不累积到下月。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">2. 支持哪些图片格式？</div>
+        <div class="faq-answer">支持 JPG、PNG、WebP 格式，最大支持 10MB 图片文件。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">3. 处理后的图片有水印吗？</div>
+        <div class="faq-answer">付费用户生成的图片均无水印，可直接商用。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">4. 如何充值积分？</div>
+        <div class="faq-answer">登录后点击右上角「充值积分」按钮，选择套餐完成支付即可。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">5. 可以升级或降级方案吗？</div>
+        <div class="faq-answer">可以。随时可以在账户中切换订阅方案，变更将在当前账单周期结束时生效。</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">6. 如何获取发票？</div>
+        <div class="faq-answer">请联系客服获取发票，我们提供正规增值税普通发票。</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>使用 Remove.bg API 技术驱动 | 安全可靠 | 7x24 小时服务</p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'https://image-background-eraser-api.tomcome618.workers.dev';
+    const USER_STORAGE_KEY = 'image_bg_remover_user';
+
+    function getUserFromStorage() {
+      try {
+        const userJson = localStorage.getItem(USER_STORAGE_KEY);
+        if (!userJson) return null;
+        return JSON.parse(userJson);
+      } catch (e) { return null; }
+    }
+
+    async function purchasePlan(plan) {
+      const user = getUserFromStorage();
+      if (!user) {
+        alert('请先登录后再购买');
+        window.location.href = '/';
+        return;
+      }
+
+      const plans = {
+        starter: { name: '入门包', price: 3, credits: 20 },
+        standard: { name: '标准包', price: 8, credits: 60 },
+        pro: { name: 'Pro月付', price: 25, credits: 200 }
+      };
+
+      const selectedPlan = plans[plan];
+      if (!selectedPlan) return;
+
+      const confirmed = confirm(`确认购买 ${selectedPlan.name}？\n价格: $${selectedPlan.price}\n将获得 ${selectedPlan.credits} 积分`);
+      if (!confirmed) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          },
+          body: JSON.stringify({
+            amount: selectedPlan.credits,
+            type: 'purchase',
+            description: `购买 ${selectedPlan.name}`
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert(`✅ 充值成功！\n\n获得 ${selectedPlan.credits} 积分\n当前余额: ${data.credits} 积分\n\n请返回首页使用！`);
+          window.location.href = '/';
+        } else {
+          alert('⚠️ 充值失败，请稍后重试');
+        }
+      } catch (e) {
+        alert('⚠️ 网络错误，请稍后重试');
+      }
+    }
+  </script>
+</body>
+</html>
