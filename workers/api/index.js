@@ -8,7 +8,8 @@ const PAYPAL_API = {
   // 生产环境用: 'https://api-m.paypal.com'
   clientId: 'Afo5KNuE2afvKy5AKDO0AYcBTajVj59T9whC6PvnSJZmaCTTN3IQ8vJcImPD37MM7SeCrix1tcxyEbzL',
   clientSecret: 'EA9F_cmcLsV3JV-hQl9lq-Up87kYRJCPws5az04UkBNFI6qlPAAf6WscjAVPgvwOyzz4AGSq0H8iwM9j',
-  merchantEmail: 'tomcome@126.com'
+  merchantEmail: 'tomcome@126.com',
+  webhookId: '0W093436YE257545E'  // PayPal Webhook ID
 };
 
 // 定价方案配置
@@ -309,16 +310,55 @@ async function handlePayPalWebhook(request, env) {
     const body = await request.text();
     const event = JSON.parse(body);
     
+    // 获取 PayPal 发送的 Headers 用于验证
+    const headers = {
+      'paypal-auth-algo': request.headers.get('paypal-auth-algo'),
+      'paypal-cert-url': request.headers.get('paypal-cert-url'),
+      'paypal-transmission-id': request.headers.get('paypal-transmission-id'),
+      'paypal-transmission-sig': request.headers.get('paypal-transmission-sig'),
+      'paypal-transmission-time': request.headers.get('paypal-transmission-time')
+    };
+    
     console.log('PayPal webhook event:', event.event_type);
+    console.log('Webhook headers:', JSON.stringify(headers));
+    
+    // 在沙箱环境下可以跳过验证（仅调试用）
+    // 生产环境必须验证签名！
+    if (PAYPAL_API.baseUrl.includes('sandbox')) {
+      console.log('Sandbox mode: skipping signature verification');
+    } else {
+      // 生产环境验证签名
+      const isValid = await verifyWebhookSignature(headers, body);
+      if (!isValid) {
+        console.error('Webhook signature verification failed');
+        return errorResponse('Invalid signature', 403);
+      }
+    }
     
     // 处理不同的 webhook 事件
     switch (event.event_type) {
       case 'PAYMENT.CAPTURE.COMPLETED':
-        console.log('Payment completed:', event.resource);
+        console.log('Payment completed:', JSON.stringify(event.resource));
+        // 从 reference_id 中提取用户和计划信息
+        // 格式: user_{id}_plan_{plan}
+        if (event.resource && event.resource.custom_id) {
+          console.log('Custom ID:', event.resource.custom_id);
+        }
         break;
+        
       case 'PAYMENT.CAPTURE.DENIED':
         console.log('Payment denied:', event.resource);
+        // 处理支付被拒的情况
         break;
+        
+      case 'CHECKOUT.ORDER.COMPLETED':
+        console.log('Checkout order completed:', event.resource);
+        break;
+        
+      case 'PAYMENT.SALE.COMPLETED':
+        console.log('Payment sale completed:', event.resource);
+        break;
+        
       default:
         console.log('Unhandled event type:', event.event_type);
     }
@@ -327,6 +367,52 @@ async function handlePayPalWebhook(request, env) {
   } catch (e) {
     console.error('Webhook error:', e);
     return errorResponse('Webhook processing failed', 500);
+  }
+}
+
+// Webhook 签名验证（生产环境使用）
+async function verifyWebhookSignature(headers, body) {
+  try {
+    const { 'paypal-auth-algo': authAlgo,
+            'paypal-cert-url': certUrl,
+            'paypal-transmission-id': transmissionId,
+            'paypal-transmission-sig': transmissionSig,
+            'paypal-transmission-time': transmissionTime } = headers;
+    
+    if (!certUrl || !transmissionId || !transmissionSig || !transmissionTime) {
+      console.error('Missing required webhook headers');
+      return false;
+    }
+    
+    // 构造要验证的荷载
+    const payload = {
+      auth_algo: authAlgo || 'SHA256withRSA',
+      cert_url: certUrl,
+      transmission_id: transmissionId,
+      transmission_sig: transmissionSig,
+      transmission_time: transmissionTime,
+      webhook_id: PAYPAL_API.webhookId, // 需要在 PayPal 后台获取
+      webhook_event: JSON.parse(body)
+    };
+    
+    // 调用 PayPal API 验证签名
+    const accessToken = await getPayPalAccessToken();
+    const response = await fetch(`${PAYPAL_API.baseUrl}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    const result = await response.json();
+    console.log('Signature verification result:', result);
+    
+    return result.verification_status === 'SUCCESS';
+  } catch (e) {
+    console.error('Signature verification error:', e);
+    return false;
   }
 }
 
