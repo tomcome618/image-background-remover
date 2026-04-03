@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>定价方案 - Image Background Remover</title>
+  <title>Pricing - Image Background Remover</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -280,92 +280,92 @@
 <body>
   <div class="container">
     <div class="header">
-      <a href="/">← 返回首页</a>
+      <a href="/">← Back to Home</a>
       <div class="user-info" id="userInfo" style="display: none;">
         <span id="userName"></span>
-        <span class="user-credits">💰 <span id="userCredits">0</span> 积分</span>
+        <span class="user-credits">💰 <span id="userCredits">0</span> credits</span>
       </div>
     </div>
 
-    <h1>💰 定价方案</h1>
-    <p class="subtitle">简单透明，按需付费，无隐藏费用</p>
+    <h1>💰 Pricing Plans</h1>
+    <p class="subtitle">Simple, transparent, pay as you go. No hidden fees.</p>
 
     <div class="pricing-grid">
       <div class="pricing-card">
-        <div class="pricing-card-name">免费试用</div>
+        <div class="pricing-card-name">Free Trial</div>
         <div class="pricing-card-price">$0</div>
-        <div class="pricing-card-credits">3 积分</div>
-        <div class="pricing-card-desc">注册即送，可体验3次</div>
-        <button class="pricing-card-btn" onclick="alert('请返回首页登录后使用')">免费试用</button>
+        <div class="pricing-card-credits">3 Credits</div>
+        <div class="pricing-card-desc">Get 3 credits on registration, try it out!</div>
+        <button class="pricing-card-btn" onclick="alert('Please login at homepage first')">Free Trial</button>
       </div>
 
       <div class="pricing-card">
-        <div class="pricing-card-name">入门包</div>
+        <div class="pricing-card-name">Starter</div>
         <div class="pricing-card-price">$3</div>
-        <div class="pricing-card-credits">20 积分</div>
-        <div class="pricing-card-desc">首次充值优惠，适合个人偶尔使用</div>
-        <button class="pricing-card-btn" id="btn-starter" onclick="openPaymentModal('starter')">立即购买</button>
+        <div class="pricing-card-credits">20 Credits</div>
+        <div class="pricing-card-desc">Perfect for occasional personal use</div>
+        <button class="pricing-card-btn" id="btn-starter" onclick="openPaymentModal('starter')">Buy Now</button>
       </div>
 
       <div class="pricing-card featured">
-        <div class="badge">最受欢迎</div>
-        <div class="pricing-card-name">标准包</div>
+        <div class="badge">Most Popular</div>
+        <div class="pricing-card-name">Standard</div>
         <div class="pricing-card-price">$8</div>
-        <div class="pricing-card-credits">60 积分</div>
-        <div class="pricing-card-desc">常用选择，性价比最高</div>
-        <button class="pricing-card-btn" id="btn-standard" onclick="openPaymentModal('standard')">立即购买</button>
+        <div class="pricing-card-credits">60 Credits</div>
+        <div class="pricing-card-desc">Best value for regular users</div>
+        <button class="pricing-card-btn" id="btn-standard" onclick="openPaymentModal('standard')">Buy Now</button>
       </div>
 
       <div class="pricing-card">
-        <div class="pricing-card-name">Pro 月付</div>
-        <div class="pricing-card-price">$25<span>/月</span></div>
-        <div class="pricing-card-credits">200 积分/月</div>
-        <div class="pricing-card-desc">高频用户首选，无限制处理</div>
-        <button class="pricing-card-btn" id="btn-pro" onclick="openPaymentModal('pro')">立即购买</button>
+        <div class="pricing-card-name">Pro Monthly</div>
+        <div class="pricing-card-price">$25<span>/mo</span></div>
+        <div class="pricing-card-credits">200 Credits/mo</div>
+        <div class="pricing-card-desc">Unlimited processing for power users</div>
+        <button class="pricing-card-btn" id="btn-pro" onclick="openPaymentModal('pro')">Buy Now</button>
       </div>
     </div>
 
     <div class="secure-badge">
       <span>🔒</span>
-      <span>安全支付由 PayPal 提供保障</span>
+      <span>Secure payments powered by PayPal</span>
     </div>
 
     <div class="faq-section">
-      <h2 class="faq-title">常见问题</h2>
+      <h2 class="faq-title">Frequently Asked Questions</h2>
 
       <div class="faq-item">
-        <div class="faq-question">1. 积分会过期吗？</div>
-        <div class="faq-answer">按需购买的积分永不过期。订阅月费方案获得的积分每月刷新，不累积到下月。</div>
+        <div class="faq-question">1. Do credits expire?</div>
+        <div class="faq-answer">Credits purchased on-demand never expire. Monthly subscription credits refresh each month and do not roll over to the next month.</div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question">2. 支持哪些图片格式？</div>
-        <div class="faq-answer">支持 JPG、PNG、WebP 格式，最大支持 10MB 图片文件。</div>
+        <div class="faq-question">2. What image formats are supported?</div>
+        <div class="faq-answer">Supports JPG, PNG, WebP formats, with a maximum file size of 10MB.</div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question">3. 处理后的图片有水印吗？</div>
-        <div class="faq-answer">付费用户生成的图片均无水印，可直接商用。</div>
+        <div class="faq-question">3. Are there watermarks on processed images?</div>
+        <div class="faq-answer">No watermarks for paid users. Images are free for commercial use.</div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question">4. 如何充值积分？</div>
-        <div class="faq-answer">登录后点击右上角「充值积分」按钮，选择套餐完成支付即可。</div>
+        <div class="faq-question">4. How do I purchase credits?</div>
+        <div class="faq-answer">After logging in, click the "Buy Credits" button in the top right corner, select a plan and complete payment.</div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question">5. 可以升级或降级方案吗？</div>
-        <div class="faq-answer">可以。随时可以在账户中切换订阅方案，变更将在当前账单周期结束时生效。</div>
+        <div class="faq-question">5. Can I upgrade or downgrade my plan?</div>
+        <div class="faq-answer">Yes. You can switch subscription plans at any time. Changes take effect at the end of your current billing cycle.</div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-question">6. 如何获取发票？</div>
-        <div class="faq-answer">请联系客服获取发票，我们提供正规增值税普通发票。</div>
+        <div class="faq-question">6. How do I get an invoice?</div>
+        <div class="faq-answer">Please contact customer support for invoices. We provide official VAT receipts.</div>
       </div>
     </div>
 
     <div class="footer">
-      <p>使用 Remove.bg API 技术驱动 | 安全可靠 | 7x24 小时服务</p>
+      <p>Powered by Remove.bg API | Secure & Reliable | 24/7 Service</p>
     </div>
   </div>
 
@@ -384,10 +384,10 @@
     <div class="modal-inner">
       <div class="modal-content">
         <div class="success-icon">🎉</div>
-        <div class="success-message">支付成功！</div>
-        <div class="success-credits" id="successCredits">+60 积分</div>
-        <div id="successBalance">当前余额: 63 积分</div>
-        <button class="success-btn" onclick="goToHome()">返回首页使用</button>
+        <div class="success-message">Payment Successful!</div>
+        <div class="success-credits" id="successCredits">+60 Credits</div>
+        <div id="successBalance">Current Balance: 63 Credits</div>
+        <button class="success-btn" onclick="goToHome()">Go to Homepage</button>
       </div>
     </div>
   </div>
@@ -399,9 +399,9 @@
     const USER_STORAGE_KEY = 'image_bg_remover_user';
 
     const PLANS = {
-      starter: { name: '入门包', price: 3, credits: 20, description: '首次充值优惠' },
-      standard: { name: '标准包', price: 8, credits: 60, description: '常用选择' },
-      pro: { name: 'Pro月付', price: 25, credits: 200, description: '高频用户首选' }
+      starter: { name: 'Starter', price: 3, credits: 20, description: 'First purchase discount' },
+      standard: { name: 'Standard', price: 8, credits: 60, description: 'Best value' },
+      pro: { name: 'Pro Monthly', price: 25, credits: 200, description: 'Power users' }
     };
 
     let currentPlan = null;
@@ -418,7 +418,7 @@
       const user = getUserFromStorage();
       if (user) {
         document.getElementById('userInfo').style.display = 'flex';
-        document.getElementById('userName').textContent = user.name || '用户';
+        document.getElementById('userName').textContent = user.name || 'User';
         document.getElementById('userCredits').textContent = user.credits || 0;
       }
     }
@@ -426,7 +426,7 @@
     async function openPaymentModal(plan) {
       const user = getUserFromStorage();
       if (!user) {
-        alert('请先登录后再购买');
+        alert('Please login before purchasing');
         window.location.href = '/';
         return;
       }
@@ -436,17 +436,17 @@
 
       const modalContent = document.getElementById('modalContent');
       modalContent.innerHTML = `
-        <div class="modal-title">购买套餐</div>
+        <div class="modal-title">Purchase Plan</div>
         <div class="modal-plan">${planData.name}</div>
         <div class="modal-price">$${planData.price}</div>
-        <div class="modal-credits">将获得 ${planData.credits} 积分</div>
+        <div class="modal-credits">You will receive ${planData.credits} credits</div>
         <div id="paypal-button-container"></div>
-        <button class="modal-cancel" onclick="closePaymentModal()">取消</button>
+        <button class="modal-cancel" onclick="closePaymentModal()">Cancel</button>
       `;
 
       document.getElementById('paymentModal').classList.add('active');
 
-      // 初始化 PayPal 按钮
+      // Initialize PayPal button
       initPayPalButton(user, plan);
     }
 
@@ -463,7 +463,7 @@
         
         if (typeof paypal === 'undefined') {
           console.error('PayPal SDK not loaded!');
-          document.getElementById('paypal-button-container').innerHTML = '<div style="color: red;">PayPal SDK 加载失败，请刷新页面重试</div>';
+          document.getElementById('paypal-button-container').innerHTML = '<div style="color: red;">PayPal SDK failed to load. Please refresh the page.</div>';
           return;
         }
         
@@ -478,7 +478,7 @@
           createOrder: async function(data, actions) {
             console.log('PayPal createOrder started, plan:', plan);
             try {
-              // 创建后端订单
+              // Create backend order
               const response = await fetch(`${API_BASE_URL}/api/paypal/create-order`, {
                 method: 'POST',
                 headers: {
@@ -493,7 +493,7 @@
               console.log('API result:', result);
               
               if (!result.success) {
-                throw new Error(result.error || '创建订单失败');
+                throw new Error(result.error || 'Failed to create order');
               }
               
               return result.orderId;
@@ -506,7 +506,7 @@
           onApprove: async function(data, actions) {
             console.log('PayPal onApprove, orderID:', data.orderID);
             try {
-              // 捕获支付
+              // Capture payment
               const response = await fetch(`${API_BASE_URL}/api/paypal/capture-order`, {
                 method: 'POST',
                 headers: {
@@ -523,31 +523,31 @@
               console.log('Capture result:', result);
               
               if (result.success) {
-                // 更新本地存储的用户积分
+                // Update local storage
                 user.credits = result.credits;
                 localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
                 
-                // 显示成功弹窗
+                // Show success modal
                 closePaymentModal();
-                document.getElementById('successCredits').textContent = `+${result.addedCredits} 积分`;
-                document.getElementById('successBalance').textContent = `当前余额: ${result.credits} 积分`;
+                document.getElementById('successCredits').textContent = `+${result.addedCredits} Credits`;
+                document.getElementById('successBalance').textContent = `Current Balance: ${result.credits} Credits`;
                 document.getElementById('successModal').classList.add('active');
                 
-                // 更新用户信息
+                // Update user info
                 updateUserInfo();
               } else {
-                alert('支付处理失败: ' + (result.message || '未知错误'));
+                alert('Payment processing failed: ' + (result.message || 'Unknown error'));
               }
             } catch (e) {
               console.error('Capture order error:', e);
-              alert('支付处理失败，请稍后重试');
+              alert('Payment processing failed, please try again later');
             }
           },
           
           onError: function(err) {
             console.error('PayPal onError:', err);
-            const errorMsg = err && err.message ? err.message : (err.toString ? err.toString() : '未知错误');
-            alert('支付过程中出现错误：' + errorMsg);
+            const errorMsg = err && err.message ? err.message : (err.toString ? err.toString() : 'Unknown error');
+            alert('Error during payment: ' + errorMsg);
           },
           
           onCancel: function(data) {
@@ -557,11 +557,11 @@
         console.log('PayPal button rendered');
       }
       
-      // 如果 SDK 已经加载，直接渲染
+      // If SDK is already loaded, render directly
       if (typeof paypal !== 'undefined') {
         renderButton();
       } else {
-        // 等待 SDK 加载
+        // Wait for SDK to load
         const checkPayPal = setInterval(() => {
           console.log('Checking PayPal SDK...', typeof paypal);
           if (typeof paypal !== 'undefined') {
@@ -570,7 +570,7 @@
           }
         }, 100);
         
-        // 超时处理
+        // Timeout
         setTimeout(() => {
           clearInterval(checkPayPal);
           console.log('PayPal SDK load timeout');
@@ -583,7 +583,7 @@
       window.location.href = '/';
     }
 
-    // 页面加载时更新用户信息
+    // Update user info on page load
     document.addEventListener('DOMContentLoaded', updateUserInfo);
   </script>
 </body>

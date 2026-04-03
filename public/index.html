@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Background Remover 🖼️</title>
+  <title>Image Background Remover</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
@@ -280,9 +280,9 @@
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script>
-    // Google OAuth 回调函数 - 必须在 g_id_onload 之前定义
+    // Google OAuth Callback - must be defined before g_id_onload
     window.handleCredentialResponse = async function(response) {
-      console.log('Google OAuth 登录成功')
+      console.log('Google OAuth login success')
 
       // 解码 JWT token 获取用户信息
       const token = response.credential
@@ -323,11 +323,11 @@
       if (authRequired) authRequired.style.display = 'none'
       if (uploadArea) uploadArea.style.display = 'block'
       if (statusMessage) {
-        statusMessage.textContent = '✅ 登录成功: ' + userData.name
+        statusMessage.textContent = '✅ Logged in: ' + userData.name
         statusMessage.className = 'status-message success'
       }
 
-      console.log('用户信息:', userData)
+      console.log('User info:', userData)
     }
   </script>
 </head>
@@ -337,7 +337,7 @@
     <div class="header">
       <div class="header-title">🖼️ Image Background Remover</div>
       <div style="display: flex; align-items: center; gap: 15px;">
-        <a href="/pricing.html" class="header-link">💰 定价</a>
+        <a href="/pricing.html" class="header-link">💰 Pricing</a>
         <div class="header-auth" id="headerAuth">
           <div id="g_id_onload"
             data-client_id="959584743825-r6r7o6tdp8nhfiogcalqid137jkns1bf.apps.googleusercontent.com"
@@ -359,71 +359,71 @@
           <img id="headerUserAvatar" class="header-user-avatar" src="" alt="用户头像">
           <span id="headerUserName"></span>
           <div id="headerCredits" class="header-credits">
-            💰 <span id="creditsBalance">0</span> 积分
+            💰 <span id="creditsBalance">0</span> credits
           </div>
-          <button id="logoutBtn" class="btn logout-btn">退出</button>
+          <button id="logoutBtn" class="btn logout-btn">Logout</button>
         </div>
       </div>
     </div>
 
-    <!-- 状态消息 -->
+    <!-- Status Message -->
     <div class="status-message info" id="statusMessage">
-      正在加载...
+      Loading...
     </div>
 
-    <!-- 登录提示区域 -->
+    <!-- Auth Required -->
     <div class="auth-required" id="authRequired" style="display: none;">
-      <h3>🔐 需要登录</h3>
-      <p>请使用右上角 Google 按钮登录以使用图片背景移除功能</p>
+      <h3>🔐 Login Required</h3>
+      <p>Please use the Google button in the top right corner to login and use the image background removal feature.</p>
     </div>
 
     <h1 style="text-align: center; margin-bottom: 30px;">Image Background Remover</h1>
 
-    <!-- 上传区域 -->
+    <!-- Upload Area -->
     <div class="upload-area" id="uploadArea" style="display: none;" onclick="handleUploadAreaClick(event)">
       <div class="upload-label">
-        📁 点击选择图片或拖拽到此处
+        📁 Click to select image or drag & drop here
       </div>
       <div class="upload-hint">
-        支持 JPG, PNG, WebP 格式 (最大 10MB)
+        Supports JPG, PNG, WebP (max 10MB)
       </div>
     </div>
 
-    <!-- 预览区域 -->
+    <!-- Preview Area -->
     <div class="preview-container" id="previewContainer" style="display: none;">
       <div class="preview-box">
-        <div class="preview-label">原图</div>
-        <img id="originalPreview" class="preview-img" src="" alt="原图">
+        <div class="preview-label">Original</div>
+        <img id="originalPreview" class="preview-img" src="" alt="Original">
       </div>
       <div class="preview-box">
-        <div class="preview-label">处理后</div>
-        <img id="processedPreview" class="preview-img" src="" alt="处理后">
+        <div class="preview-label">Processed</div>
+        <img id="processedPreview" class="preview-img" src="" alt="Processed">
       </div>
     </div>
 
-    <!-- 处理按钮 -->
-    <button class="process-btn" id="processBtn" disabled>开始移除背景</button>
+    <!-- Process Button -->
+    <button class="process-btn" id="processBtn" disabled>Remove Background</button>
 
     <div class="loading" id="loading">
-      <div>🔄 正在处理中，请稍候...</div>
-      <div style="margin-top: 10px; font-size: 0.9em;">这可能需要几秒钟时间</div>
+      <div>🔄 Processing, please wait...</div>
+      <div style="margin-top: 10px; font-size: 0.9em;">This may take a few seconds</div>
     </div>
 
     <div class="error" id="error"></div>
 
     <div class="result" id="result">
-      <div>✅ 背景移除完成！</div>
-      <a class="process-btn download-btn" id="downloadLink" download>下载图片</a>
+      <div>✅ Background removed!</div>
+      <a class="process-btn download-btn" id="downloadLink" download>Download Image</a>
     </div>
 
-    <!-- 积分不足提示 -->
+    <!-- Insufficient Credits -->
     <div id="insufficientCredits" class="insufficient-credits">
-      ⚠️ 积分不足！请先 <a href="/pricing.html" style="color: #4CAF50;">充值积分</a> 或 <a href="/pricing.html" style="color: #4CAF50;">升级方案</a>
+      ⚠️ Insufficient credits! Please <a href="/pricing.html" style="color: #4CAF50;">buy credits</a> or <a href="/pricing.html" style="color: #4CAF50;">upgrade your plan</a>
     </div>
 
     <div class="footer">
-      <p>使用 Remove.bg API 技术 | 客户端 Google OAuth 认证</p>
-      <p>无需服务器 API | 直接使用 Google One Tap 登录</p>
+      <p>Powered by Remove.bg API | Google OAuth Authentication</p>
+      <p>Client-side processing | No server-side API required</p>
     </div>
   </div>
 
@@ -473,9 +473,9 @@
           updateCreditsDisplay()
           return data.user
         }
-        throw new Error(data.error || '注册失败')
+        throw new Error(data.error || 'Registration failed')
       } catch (e) {
-        console.error('注册用户失败:', e)
+        console.error('User registration failed:', e)
         return null
       }
     }
@@ -495,7 +495,7 @@
         }
         return 0
       } catch (e) {
-        console.error('获取积分失败:', e)
+        console.error('Failed to fetch credits:', e)
         return 0
       }
     }
@@ -518,9 +518,9 @@
           updateCreditsDisplay()
           return true
         }
-        throw new Error(data.error || '积分扣减失败')
+        throw new Error(data.error || 'Failed to deduct credits')
       } catch (e) {
-        console.error('扣减积分失败:', e)
+        console.error('Failed to deduct credits:', e)
         return false
       }
     }
@@ -555,11 +555,11 @@
         window.currentUser = userData  // 同步到全局
         showUserInfo(userData)
         showAppContent()
-        statusMessage.textContent = '✅ 已登录: ' + userData.name
+        statusMessage.textContent = '✅ Logged in: ' + userData.name
         statusMessage.className = 'status-message success'
       } else {
         showLoginPrompt()
-        statusMessage.textContent = '🔐 请点击右上角 Google 按钮登录'
+        statusMessage.textContent = '🔐 Please click the Google button in the top right to login'
         statusMessage.className = 'status-message info'
       }
     }
@@ -581,7 +581,7 @@
 
         return userData
       } catch (error) {
-        console.error('读取用户信息失败:', error)
+        console.error('Failed to read user info:', error)
         clearUserStorage()
         return null
       }
@@ -593,7 +593,7 @@
         userData.timestamp = Date.now()
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
       } catch (error) {
-        console.error('保存用户信息失败:', error)
+        console.error('Failed to save user info:', error)
       }
     }
 
@@ -650,15 +650,15 @@
       currentUser = null
       window.currentUser = null
       showLoginPrompt()
-      statusMessage.textContent = '🔐 已退出登录，请重新登录'
+      statusMessage.textContent = '🔐 Logged out, please login again'
       statusMessage.className = 'status-message info'
 
-      // 调用 Google 登出
+      // Call Google logout
       if (typeof google !== 'undefined') {
         google.accounts.id.disableAutoSelect()
         if (userEmail) {
           google.accounts.id.revoke(userEmail, () => {
-            console.log('Google 账号已登出')
+            console.log('Google account logged out')
           })
         }
       }
@@ -721,17 +721,17 @@
         console.log('currentUser is null, checking localStorage...')
         const stored = localStorage.getItem(USER_STORAGE_KEY)
         console.log('localStorage content:', stored ? 'exists' : 'null')
-        showError('请先登录')
+        showError('Please login first')
         return
       }
 
       if (!file.type.match('image.*')) {
-        showError('请选择图片文件')
+        showError('Please select an image file')
         return
       }
 
       if (file.size > 10 * 1024 * 1024) {
-        showError('文件大小不能超过 10MB')
+        showError('File size cannot exceed 10MB')
         return
       }
 
@@ -751,11 +751,11 @@
     // 处理按钮点击
     processBtn.addEventListener('click', async () => {
       if (!currentUser) {
-        showError('请先登录')
+        showError('Please login first')
         return
       }
       if (!currentFile) {
-        showError('请先选择图片')
+        showError('Please select an image first')
         return
       }
 
@@ -769,16 +769,16 @@
       // 扣减积分 (1积分 = 1张图片)
       const deductSuccess = await deductCredits(1, '图片背景移除')
       if (!deductSuccess) {
-        showError('积分扣减失败，请稍后重试')
+        showError('Failed to deduct credits, please try again')
         return
       }
 
-      // 调用 BackgroundRemover 的处理方法
+      // Call BackgroundRemover process method
       if (window.backgroundRemover) {
         window.backgroundRemover.currentFile = currentFile
         window.backgroundRemover.processImage()
       } else {
-        showError('图片处理组件未初始化，请刷新页面')
+        showError('Image processing component not initialized, please refresh the page')
       }
     })
   </script>
