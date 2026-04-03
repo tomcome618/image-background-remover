@@ -35,6 +35,17 @@
     .header a:hover {
       background: rgba(255,255,255,0.2);
     }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-credits {
+      background: rgba(76, 175, 80, 0.3);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+    }
     h1 {
       text-align: center;
       font-size: 2.5em;
@@ -122,6 +133,117 @@
     .pricing-card-btn:active {
       transform: scale(0.98);
     }
+    .pricing-card-btn:disabled {
+      background: #888;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .payment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .payment-modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      color: #333;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-inner {
+      position: relative;
+    }
+    .modal-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .modal-plan {
+      color: #4CAF50;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .modal-price {
+      font-size: 2em;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .modal-credits {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    #paypal-button-container {
+      min-height: 44px;
+      margin-bottom: 15px;
+    }
+    .modal-cancel {
+      background: none;
+      border: 1px solid #ccc;
+      color: #666;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .modal-cancel:hover {
+      background: #f5f5f5;
+    }
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    .success-message {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .success-credits {
+      color: #4CAF50;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .success-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85em;
+    }
     .faq-section {
       margin-top: 50px;
     }
@@ -159,6 +281,10 @@
   <div class="container">
     <div class="header">
       <a href="/">← 返回首页</a>
+      <div class="user-info" id="userInfo" style="display: none;">
+        <span id="userName"></span>
+        <span class="user-credits">💰 <span id="userCredits">0</span> 积分</span>
+      </div>
     </div>
 
     <h1>💰 定价方案</h1>
@@ -178,16 +304,16 @@
         <div class="pricing-card-price">$3</div>
         <div class="pricing-card-credits">20 积分</div>
         <div class="pricing-card-desc">首次充值优惠，适合个人偶尔使用</div>
-        <button class="pricing-card-btn" onclick="purchasePlan('starter')">立即购买</button>
+        <button class="pricing-card-btn" id="btn-starter" onclick="openPaymentModal('starter')">立即购买</button>
       </div>
 
       <div class="pricing-card featured">
-        <div class class="badge">最受欢迎</div>
+        <div class="badge">最受欢迎</div>
         <div class="pricing-card-name">标准包</div>
         <div class="pricing-card-price">$8</div>
         <div class="pricing-card-credits">60 积分</div>
         <div class="pricing-card-desc">常用选择，性价比最高</div>
-        <button class="pricing-card-btn" onclick="purchasePlan('standard')">立即购买</button>
+        <button class="pricing-card-btn" id="btn-standard" onclick="openPaymentModal('standard')">立即购买</button>
       </div>
 
       <div class="pricing-card">
@@ -195,8 +321,13 @@
         <div class="pricing-card-price">$25<span>/月</span></div>
         <div class="pricing-card-credits">200 积分/月</div>
         <div class="pricing-card-desc">高频用户首选，无限制处理</div>
-        <button class="pricing-card-btn" onclick="purchasePlan('pro')">立即购买</button>
+        <button class="pricing-card-btn" id="btn-pro" onclick="openPaymentModal('pro')">立即购买</button>
       </div>
+    </div>
+
+    <div class="secure-badge">
+      <span>🔒</span>
+      <span>安全支付由 PayPal 提供保障</span>
     </div>
 
     <div class="faq-section">
@@ -238,9 +369,42 @@
     </div>
   </div>
 
+  <!-- Payment Modal -->
+  <div class="payment-modal" id="paymentModal">
+    <div class="modal-inner">
+      <button class="modal-close" onclick="closePaymentModal()">×</button>
+      <div class="modal-content" id="modalContent">
+        <!-- Content loaded dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="payment-modal" id="successModal">
+    <div class="modal-inner">
+      <div class="modal-content">
+        <div class="success-icon">🎉</div>
+        <div class="success-message">支付成功！</div>
+        <div class="success-credits" id="successCredits">+60 积分</div>
+        <div id="successBalance">当前余额: 63 积分</div>
+        <button class="success-btn" onclick="goToHome()">返回首页使用</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.paypal.com/sdk/js?client-id=Afo5KNuE2afvKy5AKDO0AYcBTajVj59T9whC6PvnSJZmaCTTN3IQ8vJcImPD37MM7SeCrix1tcxyEbzL&currency=USD" async></script>
+  
   <script>
     const API_BASE_URL = 'https://image-background-eraser-api.tomcome618.workers.dev';
     const USER_STORAGE_KEY = 'image_bg_remover_user';
+
+    const PLANS = {
+      starter: { name: '入门包', price: 3, credits: 20, description: '首次充值优惠' },
+      standard: { name: '标准包', price: 8, credits: 60, description: '常用选择' },
+      pro: { name: 'Pro月付', price: 25, credits: 200, description: '高频用户首选' }
+    };
+
+    let currentPlan = null;
 
     function getUserFromStorage() {
       try {
@@ -250,7 +414,16 @@
       } catch (e) { return null; }
     }
 
-    async function purchasePlan(plan) {
+    function updateUserInfo() {
+      const user = getUserFromStorage();
+      if (user) {
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('userName').textContent = user.name || '用户';
+        document.getElementById('userCredits').textContent = user.credits || 0;
+      }
+    }
+
+    async function openPaymentModal(plan) {
       const user = getUserFromStorage();
       if (!user) {
         alert('请先登录后再购买');
@@ -258,42 +431,134 @@
         return;
       }
 
-      const plans = {
-        starter: { name: '入门包', price: 3, credits: 20 },
-        standard: { name: '标准包', price: 8, credits: 60 },
-        pro: { name: 'Pro月付', price: 25, credits: 200 }
-      };
+      currentPlan = plan;
+      const planData = PLANS[plan];
 
-      const selectedPlan = plans[plan];
-      if (!selectedPlan) return;
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div class="modal-title">购买套餐</div>
+        <div class="modal-plan">${planData.name}</div>
+        <div class="modal-price">$${planData.price}</div>
+        <div class="modal-credits">将获得 ${planData.credits} 积分</div>
+        <div id="paypal-button-container"></div>
+        <button class="modal-cancel" onclick="closePaymentModal()">取消</button>
+      `;
 
-      const confirmed = confirm(`确认购买 ${selectedPlan.name}？\n价格: $${selectedPlan.price}\n将获得 ${selectedPlan.credits} 积分`);
-      if (!confirmed) return;
+      document.getElementById('paymentModal').classList.add('active');
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/user/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-          },
-          body: JSON.stringify({
-            amount: selectedPlan.credits,
-            type: 'purchase',
-            description: `购买 ${selectedPlan.name}`
-          })
-        });
-        const data = await response.json();
-        if (data.success) {
-          alert(`✅ 充值成功！\n\n获得 ${selectedPlan.credits} 积分\n当前余额: ${data.credits} 积分\n\n请返回首页使用！`);
-          window.location.href = '/';
-        } else {
-          alert('⚠️ 充值失败，请稍后重试');
-        }
-      } catch (e) {
-        alert('⚠️ 网络错误，请稍后重试');
-      }
+      // 初始化 PayPal 按钮
+      initPayPalButton(user, plan);
     }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.remove('active');
+      currentPlan = null;
+    }
+
+    function initPayPalButton(user, plan) {
+      // 等待 PayPal SDK 加载
+      const checkPayPal = setInterval(() => {
+        if (typeof paypal !== 'undefined') {
+          clearInterval(checkPayPal);
+          
+          paypal.Buttons({
+            style: {
+              layout: 'vertical',
+              color: 'blue',
+              shape: 'rect',
+              label: 'paypal'
+            },
+            
+            createOrder: async function(data, actions) {
+              try {
+                // 创建后端订单
+                const response = await fetch(`${API_BASE_URL}/api/paypal/create-order`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                  },
+                  body: JSON.stringify({ plan: plan })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                  alert('创建订单失败: ' + result.error);
+                  return;
+                }
+                
+                return result.orderId;
+              } catch (e) {
+                console.error('Create order error:', e);
+                alert('创建订单失败，请稍后重试');
+              }
+            },
+            
+            onApprove: async function(data, actions) {
+              try {
+                // 捕获支付
+                const response = await fetch(`${API_BASE_URL}/api/paypal/capture-order`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                  },
+                  body: JSON.stringify({ 
+                    orderId: data.orderID,
+                    plan: plan
+                  })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                  // 更新本地存储的用户积分
+                  user.credits = result.credits;
+                  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+                  
+                  // 显示成功弹窗
+                  closePaymentModal();
+                  document.getElementById('successCredits').textContent = `+${result.addedCredits} 积分`;
+                  document.getElementById('successBalance').textContent = `当前余额: ${result.credits} 积分`;
+                  document.getElementById('successModal').classList.add('active');
+                  
+                  // 更新用户信息
+                  updateUserInfo();
+                } else {
+                  alert('支付处理失败: ' + (result.message || '未知错误'));
+                }
+              } catch (e) {
+                console.error('Capture order error:', e);
+                alert('支付处理失败，请稍后重试');
+              }
+            },
+            
+            onError: function(err) {
+              console.error('PayPal error:', err);
+              alert('支付过程中出现错误，请稍后重试');
+            },
+            
+            onCancel: function(data) {
+              console.log('Payment cancelled:', data);
+            }
+          }).render('#paypal-button-container');
+        }
+      }, 100);
+      
+      // 超时处理
+      setTimeout(() => {
+        clearInterval(checkPayPal);
+      }, 10000);
+    }
+
+    function goToHome() {
+      document.getElementById('successModal').classList.remove('active');
+      window.location.href = '/';
+    }
+
+    // 页面加载时更新用户信息
+    document.addEventListener('DOMContentLoaded', updateUserInfo);
   </script>
 </body>
 </html>

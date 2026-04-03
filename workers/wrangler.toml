@@ -1,14 +1,13 @@
 name = "image-background-eraser-api"
 main = "api/index.js"
 compatibility_date = "2024-01-01"
-
-[site]
-bucket = "../dist"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "image-background-eraser"
-database_id = "YOUR_DATABASE_ID_HERE"
+database_id = "533e648e-d2e9-4aaa-8e95-077d52c3ef6a"
 
-[vars]]
+[vars]
 FREE_CREDITS = "3"
+PAYPAL_MERCHANT_EMAIL = "tomcome@126.com"
