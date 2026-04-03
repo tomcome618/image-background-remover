@@ -2,10 +2,10 @@
  * Cloudflare Workers API - 用户积分系统 + PayPal 支付 (ES Module Format)
  */
 
-// PayPal API 配置 - 生产环境
+// PayPal API 配置 - 沙箱环境
 const PAYPAL_API = {
-  baseUrl: 'https://api-m.paypal.com',  // 全球版 PayPal API
-  // 如果是国内 PayPal.cn，使用: 'https://api-m.sandbox.paypal.cn'
+  baseUrl: 'https://api-m.sandbox.paypal.com',  // 沙箱环境用这个
+  // 生产环境用: 'https://api-m.paypal.com'
   clientId: 'Afo5KNuE2afvKy5AKDO0AYcBTajVj59T9whC6PvnSJZmaCTTN3IQ8vJcImPD37MM7SeCrix1tcxyEbzL',
   clientSecret: 'EA9F_cmcLsV3JV-hQl9lq-Up87kYRJCPws5az04UkBNFI6qlPAAf6WscjAVPgvwOyzz4AGSq0H8iwM9j',
   merchantEmail: 'tomcome@126.com'
