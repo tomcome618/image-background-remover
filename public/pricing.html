@@ -392,7 +392,7 @@
     </div>
   </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=Afo5KNuE2afvKy5AKDO0AYcBTajVj59T9whC6PvnSJZmaCTTN3IQ8vJcImPD37MM7SeCrix1tcxyEbzL&currency=USD" async></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=Afo5KNuE2afvKy5AKDO0AYcBTajVj59T9whC6PvnSJZmaCTTN3IQ8vJcImPD37MM7SeCrix1tcxyEbzL&currency=USD"></script>
   
   <script>
     const API_BASE_URL = 'https://image-background-eraser-api.tomcome618.workers.dev';
@@ -456,100 +456,126 @@
     }
 
     function initPayPalButton(user, plan) {
-      // 等待 PayPal SDK 加载
-      const checkPayPal = setInterval(() => {
-        if (typeof paypal !== 'undefined') {
-          clearInterval(checkPayPal);
-          
-          paypal.Buttons({
-            style: {
-              layout: 'vertical',
-              color: 'blue',
-              shape: 'rect',
-              label: 'paypal'
-            },
-            
-            createOrder: async function(data, actions) {
-              try {
-                // 创建后端订单
-                const response = await fetch(`${API_BASE_URL}/api/paypal/create-order`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                  },
-                  body: JSON.stringify({ plan: plan })
-                });
-                
-                const result = await response.json();
-                
-                if (!result.success) {
-                  alert('创建订单失败: ' + result.error);
-                  return;
-                }
-                
-                return result.orderId;
-              } catch (e) {
-                console.error('Create order error:', e);
-                alert('创建订单失败，请稍后重试');
-              }
-            },
-            
-            onApprove: async function(data, actions) {
-              try {
-                // 捕获支付
-                const response = await fetch(`${API_BASE_URL}/api/paypal/capture-order`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                  },
-                  body: JSON.stringify({ 
-                    orderId: data.orderID,
-                    plan: plan
-                  })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                  // 更新本地存储的用户积分
-                  user.credits = result.credits;
-                  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-                  
-                  // 显示成功弹窗
-                  closePaymentModal();
-                  document.getElementById('successCredits').textContent = `+${result.addedCredits} 积分`;
-                  document.getElementById('successBalance').textContent = `当前余额: ${result.credits} 积分`;
-                  document.getElementById('successModal').classList.add('active');
-                  
-                  // 更新用户信息
-                  updateUserInfo();
-                } else {
-                  alert('支付处理失败: ' + (result.message || '未知错误'));
-                }
-              } catch (e) {
-                console.error('Capture order error:', e);
-                alert('支付处理失败，请稍后重试');
-              }
-            },
-            
-            onError: function(err) {
-              console.error('PayPal error:', err);
-              alert('支付过程中出现错误，请稍后重试');
-            },
-            
-            onCancel: function(data) {
-              console.log('Payment cancelled:', data);
-            }
-          }).render('#paypal-button-container');
-        }
-      }, 100);
+      console.log('initPayPalButton called, checking SDK...');
       
-      // 超时处理
-      setTimeout(() => {
-        clearInterval(checkPayPal);
-      }, 10000);
+      function renderButton() {
+        console.log('Rendering PayPal button...');
+        
+        if (typeof paypal === 'undefined') {
+          console.error('PayPal SDK not loaded!');
+          document.getElementById('paypal-button-container').innerHTML = '<div style="color: red;">PayPal SDK 加载失败，请刷新页面重试</div>';
+          return;
+        }
+        
+        paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'blue',
+            shape: 'rect',
+            label: 'paypal'
+          },
+          
+          createOrder: async function(data, actions) {
+            console.log('PayPal createOrder started, plan:', plan);
+            try {
+              // 创建后端订单
+              const response = await fetch(`${API_BASE_URL}/api/paypal/create-order`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({ plan: plan })
+              });
+              
+              console.log('API response status:', response.status);
+              const result = await response.json();
+              console.log('API result:', result);
+              
+              if (!result.success) {
+                throw new Error(result.error || '创建订单失败');
+              }
+              
+              return result.orderId;
+            } catch (e) {
+              console.error('Create order error:', e);
+              throw e;
+            }
+          },
+          
+          onApprove: async function(data, actions) {
+            console.log('PayPal onApprove, orderID:', data.orderID);
+            try {
+              // 捕获支付
+              const response = await fetch(`${API_BASE_URL}/api/paypal/capture-order`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({ 
+                  orderId: data.orderID,
+                  plan: plan
+                })
+              });
+              
+              const result = await response.json();
+              console.log('Capture result:', result);
+              
+              if (result.success) {
+                // 更新本地存储的用户积分
+                user.credits = result.credits;
+                localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+                
+                // 显示成功弹窗
+                closePaymentModal();
+                document.getElementById('successCredits').textContent = `+${result.addedCredits} 积分`;
+                document.getElementById('successBalance').textContent = `当前余额: ${result.credits} 积分`;
+                document.getElementById('successModal').classList.add('active');
+                
+                // 更新用户信息
+                updateUserInfo();
+              } else {
+                alert('支付处理失败: ' + (result.message || '未知错误'));
+              }
+            } catch (e) {
+              console.error('Capture order error:', e);
+              alert('支付处理失败，请稍后重试');
+            }
+          },
+          
+          onError: function(err) {
+            console.error('PayPal onError:', err);
+            const errorMsg = err && err.message ? err.message : (err.toString ? err.toString() : '未知错误');
+            alert('支付过程中出现错误：' + errorMsg);
+          },
+          
+          onCancel: function(data) {
+            console.log('Payment cancelled:', data);
+          }
+        }).render('#paypal-button-container');
+        console.log('PayPal button rendered');
+      }
+      
+      // 如果 SDK 已经加载，直接渲染
+      if (typeof paypal !== 'undefined') {
+        renderButton();
+      } else {
+        // 等待 SDK 加载
+        const checkPayPal = setInterval(() => {
+          console.log('Checking PayPal SDK...', typeof paypal);
+          if (typeof paypal !== 'undefined') {
+            clearInterval(checkPayPal);
+            renderButton();
+          }
+        }, 100);
+        
+        // 超时处理
+        setTimeout(() => {
+          clearInterval(checkPayPal);
+          console.log('PayPal SDK load timeout');
+        }, 10000);
+      }
     }
 
     function goToHome() {
